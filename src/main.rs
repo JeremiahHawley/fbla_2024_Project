@@ -4,28 +4,9 @@
 // 
 
 
-/* this is the partner struct that will be the datatype for each individual "partner", 
-it'll make data management easier and more straightforward (entire database can be one vector of partners)*/ 
-struct partner {
-    // name will be used for the name of the actual partner whether that is the name of the person like "John" or a business like "DJ's"
-    name: String,
-    // values will be the list of scholarships/donations/etc that the partner has using a vector of enums that implement the scholarship/donation structs
-    values: Vec<partner_value_type>,
-}
 
-enum partner_value_type { 
-    Scholarship { // the `struct` keyword is not needed when creating an enum variant (design pattern is often refered to as "struct-like enum variants")
-        name: String,
-        amount: f32
-        //TODO: add more types if needed
-    },
-    Donation {
-        name: String,
-        amount: f32
-        //TODO: add more types if needed
-    }
-    //TODO: add more types
-}
+
+
 
 
 
