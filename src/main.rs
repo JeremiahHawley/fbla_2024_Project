@@ -4,21 +4,34 @@
 // 
 
 
-/* this is the partner struct that will be the datatype for each individual "parntner", 
+/* this is the partner struct that will be the datatype for each individual "partner", 
 it'll make data management easier and more straightforward (entire database can be one vector of partners)*/ 
 struct partner {
-    //name will be used for the name of the actual partner wether that is the name of the person like "John" or a buisness like "DJ's"
+    //name will be used for the name of the actual partner whether that is the name of the person like "John" or a business like "DJ's"
     name: String,
-    // all values are strings, this values vector will just store every value like donations, scholarsips, etc.
-    values: Vec<String>,
-    /*this vector wil store what the values of "values" actually is, so if values[0] \
-    stores the name of a scholarship, then values_names[0] would be "scholarships" */ 
-    values_names: Vec<String>
+    // values will be the list of scholarships/donations/etc that the partner has using a vector of enums that implement the scholarship/donation structs
+    values: Vec<partner_value_type>,
+}
+
+enum partner_value_type { 
+    Scholarship { // the `struct` keyword is not needed when creating an enum variant (design pattern is often refered to as "struct-like enum variants")
+        name: String,
+        amount: f32
+        //TODO: add more types if needed
+    },
+    Donation {
+        name: String,
+        amount: f32
+        //TODO: add more types if needed
+    }
+    //TODO: add more types
 }
 
 
-fn read_collumn(filename: &str, column_name: &str) -> Vec<String>{
-    // return a vector of the string valies of the collumn where the top value of the column is column_name
+
+
+fn read_column(filename: &str, column_name: &str) -> Vec<String>{
+    // return a vector of the string valies of the column where the top value of the column is column_name
     return vec!["test".to_string()]
 }
 
@@ -31,7 +44,7 @@ fn create_file(filename: &str) {
     //TODO: create a csv file with the filename
 }
 
-fn edit_file(databasename: &str, row: usize, columnum: usize, new_value: &String) { 
+fn edit_file(databasename: &str, row: usize, column_num: usize, new_value: &String) { 
     //TODO: change the value of the database (file) in spot [row][column] to the value new_value
 }
 
