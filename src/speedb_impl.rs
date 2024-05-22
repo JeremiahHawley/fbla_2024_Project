@@ -8,6 +8,9 @@
 
 use surrealdb::Surreal; // use the SurrealDB library
 use surrealdb::sql::Thing;
+use surrealdb::sql::Value;
+use surrealdb::engine::local::Db; // for a local database
+use tokio; // for async operations
 use serde::{Deserialize, Serialize}; // used for serializing and deserializing Rust data structures.
 
 // TODO: create structs
@@ -42,37 +45,42 @@ enum partner_value_type {
     //TODO: add more types
 }
 
-// TODO: create database
 
-// Create database connection with SpeeDB
 
-fn main() {
 
-    let db = match Surreal::new::<SpeeDB>("surrealdb_speedb").await {
-        Ok(db) => db,
-        Err(err) => {
-            // print text to the error stream
-            eprintln!("Failed to create Speedb database: {}", err);
-            process::exit(1);
-        }
-    };
+#[tokio::main]
+async fn main() {
+    // Create database connection with SpeeDB
+    // create new database/connect to the database folder where it will put the database files
+    let db = Surreal::new::<Speedb>("surreal_database").await?;
     
 }
 
+// TODO: function to import from CSV
+// TODO: function to prompt user to create new record using the slint GUI
 
 
 
 
-// TODO: determine where database is stored
-// TODO: if existing database, use that, if not, create one
+// =========
+// Reference
+// =========
+/*
+Create: db.create("person").content(...) creates a new record.
+Read: db.select("person").await? reads the record.
+Update: db.update("person").content(...) updates the record.
+Delete: db.delete("person").await? deletes the record.
 
+// Create a record
+let created: Value = db
+    .create("person")
+    .content(serde_json::json!({
+        "name": "John Doe",
+        "age": 30,
+     }))
+    .await?;
 
-
-
-
-
-
-
+*/
 
 
 
