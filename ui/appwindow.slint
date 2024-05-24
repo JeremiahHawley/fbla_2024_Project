@@ -1,0 +1,144 @@
+// ===============================================================
+// This file includes the slint objects almost like an html file
+// ===============================================================
+
+
+//skeleton code to go in main.rs
+/* 
+fn main() {
+    MainWindow::new().unwrap().run().unwrap();
+}
+*/
+
+
+
+// data struct definitions
+// TODO: take in csv information from csv.rs
+
+// component definitions
+
+
+
+
+// import { Button, VerticalBox, VerticalLayout, HorizontalLayout } from "std-widgets.slint";
+
+export component AppWindow inherits Window {
+    width: 1200px;
+    height: 1000px;
+
+    HorizontalLayout { // creates an unnamed `HorizonalLayout`
+        left_side := VerticalLayout {
+            min-width: 100px;
+            horizontal-stretch: 0.5;
+            
+            menu_option := Rectangle { // creates a new `Rectangle` named "menu_option"
+            // use `Button` to create a dropdown that has a selection, each of which when clicked creates a new `TabWidget`
+                background: red;
+                min-height: 50px;
+                vertical-stretch: 0.25;
+                
+            }
+
+            filter_options := Rectangle { // use a VerticalLayout of `ComboBox`
+                background: orange;
+            }
+        }
+
+        right_side := VerticalLayout { 
+
+            add_new_record := Rectangle { // use `LineEdit` for text input, `CheckBox` for scholarship boolean, maybe others
+                background: blue;
+                min-height: menu-option.min-height; // sets the dimensions to be the same as those of "menu_option"
+                vertical-stretch: menu-option.vertical-stretch;
+            }
+
+            table_display := Rectangle { // use `StandardTableView` 
+                background: green;
+            }
+
+        }
+    }
+
+
+
+
+}
+
+
+
+/*
+component Button inherits Rectangle {
+    // TODO: implement button component/struct
+}
+
+export component MainWindow inherits Window {
+    width: 400px; // logical pixels (before device specific scaling)
+    height: 400px;
+
+
+
+    // component member implementation (put into displayed window)
+}
+
+*/
+
+
+
+
+
+
+
+
+
+/*
+TouchArea { // when clicked (put this in the component)
+    clicked => {
+        // Delegate to the user of this element
+        root.clicked(); // root refers to the outermost element in the component
+    }
+}
+
+callback keyword is used to call a rust function outside of slint
+
+*/
+
+
+
+/* TODO: (some of the logic may need to go in gui.rs)
+
+Make good layout
+
+Buttons:
+    - implement the functions below
+
+Functions:
+- sort/filter table
+    - has scholarships
+    - alphabetically by name
+    - reverse alphabetically by name
+    - TODO: add more filters/sorts
+- edit table
+    - add
+    - update
+    - delete
+
+Windows/Modes/Menus:
+- help menu
+- import/export csv
+- settings menu
+- home menu
+- table view 
+
+Table Display:
+- sort options
+- filter options
+
+
+ADD GPT INTEGRATION FOR THE HELP
+
+
+*/
+
+
+
+
