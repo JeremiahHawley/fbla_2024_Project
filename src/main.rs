@@ -5,10 +5,8 @@
 // q&a feature
 // encrypt and decrypt 
 // 
-mod gui;
 mod csv;
 
 fn main() {
-    csv::hello_csv();
-    gui::hello_gui();
+    let _ = csv::test_file_reading();
 }
