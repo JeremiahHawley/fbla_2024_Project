@@ -4,22 +4,13 @@
 // autosave feature
 // q&a feature
 // encrypt and decrypt 
-<<<<<<< HEAD
 // 
-=======
-
-// CURRENTLY EXCLUDED SINCE USING ui/appwindow.slint instead of gui.rs though may use gui.rs for some functions
-// mod gui;
-
->>>>>>> origin/master
 mod csv;
 
 /* 
 
 fn main() {
-<<<<<<< HEAD
     let _ = csv::test_file_reading();
-=======
     csv::hello_csv();
     gui::hello_gui();
 }
@@ -37,5 +28,4 @@ fn main() -> Result<(), slint::PlatformError> {
     }); */
 
     ui.run()
->>>>>>> origin/master
 }

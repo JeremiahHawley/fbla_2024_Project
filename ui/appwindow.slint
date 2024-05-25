@@ -22,6 +22,7 @@ fn main() {
 
 // import { Button, VerticalBox, VerticalLayout, HorizontalLayout } from "std-widgets.slint";
 
+import { ComboBox, CheckBox, Button, StandardTableView } from "std-widgets.slint";
 export component AppWindow inherits Window {
     width: 1200px;
     height: 1000px;
@@ -32,15 +33,83 @@ export component AppWindow inherits Window {
             horizontal-stretch: 0.5;
             
             menu_option := Rectangle { // creates a new `Rectangle` named "menu_option"
-            // use `Button` to create a dropdown that has a selection, each of which when clicked creates a new `TabWidget`
+            // use `Button` to create a dropdown that has a selection, each of which when clicked creates a new
                 background: red;
                 min-height: 50px;
+                max-height: 100px;
                 vertical-stretch: 0.25;
                 
             }
 
             filter_options := Rectangle { // use a VerticalLayout of `ComboBox`
                 background: orange;
+                sort_order := ComboBox {
+                    y: 0px;
+                    width: self.preferred-width;
+                    height: self.preferred-height;
+                    model: ["first", "second", "third"]; // TODO: rename/create sort orders
+                    current-value: "first";
+                }
+                /*
+                has_scholarship_filter := CheckBox {
+                    y: 50px;
+                    width: parent.width;
+                    height: parent.height;
+                    text: "hasScholarship";
+                }
+                */
+
+                // TODO: checkboxes for shown/hidden columns (under a text header)
+                Text {
+                    // TODO: size and location
+                    text: "Hide Columns";
+                }
+
+                is_name_hidden := CheckBox {
+                    x: parent.x + parent.width*(1/3);
+                    y: parent.y + parent.height*(1/8);
+                    width: 50px;
+                    height: 50px;
+                    text: "Name";
+                }
+                is_value_hidden := CheckBox {
+                    x: parent.x + parent.width*(1/3);
+                    y: parent.y + parent.height*(2/8);
+                    width: 50px;
+                    height: 50px;
+                    text: "Value";
+                }
+                is_type_hidden := CheckBox {
+                    x: parent.x + parent.width*(1/3);
+                    y: parent.y + parent.height*(3/8);
+                    width: 50px;
+                    height: 50px;
+                    text: "Type";
+                }
+                is_phone_number_hidden := CheckBox {
+                    x: parent.x + parent.width*(1/3);
+                    y: parent.y + parent.height*(4/8);
+                    width: 50px;
+                    height: 50px;
+                    text: "Phone Number";
+                }
+                is_address_hidden := CheckBox {
+                    x: parent.x + parent.width*(1/3);
+                    y: parent.y + parent.height*(5/8);
+                    width: 50px;
+                    height: 50px;
+                    text: "Address";
+                }
+                is_scholarship_hidden := CheckBox {
+                    x: parent.x + parent.width*(1/3);
+                    y: parent.y + parent.height*(6/8);
+                    width: 50px;
+                    height: 50px;
+                    text: "Scholarship";
+                }
+
+
+
             }
         }
 
@@ -50,12 +119,45 @@ export component AppWindow inherits Window {
                 background: blue;
                 min-height: menu-option.min-height; // sets the dimensions to be the same as those of "menu_option"
                 vertical-stretch: menu-option.vertical-stretch;
+
+                add_record := Button {
+                    x: parent.x + parent.width*(1/3);
+                    y: parent.y + parent.height/2;
+                    text: "add record";
+                }
+                delete_record := Button {
+                    x: parent.x + parent.width*(2/3);
+                    y: parent.y + parent.height/2;
+                    text: "delete record";
+                }
+
             }
 
             table_display := Rectangle { // use `StandardTableView` 
                 background: green;
-            }
 
+                csv_display := StandardTableView {
+                    x: parent.x;
+                    y: parent.y;
+                    width: parent.width;
+                    height: parent.height;
+
+                    columns: [
+                        {title: "header 1"}, {title: "header 2"} // TODO: make variables from imported csv
+                    ];
+                    rows: [ // organized how it would view // TODO: automate populating table from csv // use set-current-row(int): Sets the current row by index and brings it into view.
+                        [
+                            { text: "Item 1" }, { text: "Item 2" }
+                        ],
+                        [
+                            { text: "Item 3" }, { text: "Item 4" }
+                        ],
+                        [
+                            { text: "Item 5" }, { text: "Item 6" }
+                        ]
+                    ];
+                }
+            }
         }
     }
 

@@ -38,7 +38,7 @@ pub fn create_partner(row: &Vec<String>) -> Partner{
     return Partner{name: name, values: values};
 }
 
-pub fn 
+// pub fn 
 
 fn main(){
     let test_row_vec: Vec<String> = vec!["Jeremiah Hawley".to_string(),
