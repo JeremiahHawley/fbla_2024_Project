@@ -17,8 +17,10 @@ fn main() {
 */
 
 slint::include_modules!();
-use slint::{Model, ModelRc, StandardListViewItem, TableColumn, VecModel};
+use slint::{Model, ModelRc, StandardListViewItem, TableColumn, VecModel, SharedString};
 use std::rc::Rc;
+
+
 
 fn main() -> Result<(), slint::PlatformError> {
     let ui = AppWindow::new()?;
@@ -37,8 +39,8 @@ fn main() -> Result<(), slint::PlatformError> {
     // =================================================================================
     // =================================================================================
 
-    let body_model_rc: ModelRc<ModelRc<StandardListViewItem>> = ModelRc::from(body_model);
-
+    let body_model_rc: ModelRc<ModelRc<StandardListViewItem>> = ModelRc::from(Rc::new(body_model.clone()).into());
+    
     /*let body_model_rc = ModelRc::<ModelRc<StandardListViewItem>>::from(
         Into::<ModelRc<ModelRc<StandardListViewItem>>>::into(body_model.clone()).into()
     );*/
