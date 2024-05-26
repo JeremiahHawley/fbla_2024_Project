@@ -24,10 +24,14 @@ fn main() {
 
 import { ComboBox, CheckBox, Button, StandardTableView } from "std-widgets.slint";
 export component AppWindow inherits Window {
+    // `in` means that it is data that is taken into the widget but cannot be modified by the widget
+    in property <[[StandardListViewItem]]> table-data; // 2d vector of values excluding the header row
+    in property <[TableColumn]> header-data; // 1d vector of values that is just the header row/column titles
+
     width: 1200px;
     height: 1000px;
 
-    HorizontalLayout { // creates an unnamed `HorizonalLayout`
+    main_layout := HorizontalLayout { // creates an unnamed `HorizonalLayout`
         left_side := VerticalLayout {
             min-width: 100px;
             horizontal-stretch: 0.5;
@@ -137,25 +141,13 @@ export component AppWindow inherits Window {
                 background: green;
 
                 csv_display := StandardTableView {
+                    
                     x: parent.x;
                     y: parent.y;
                     width: parent.width;
                     height: parent.height;
-
-                    columns: [
-                        {title: "header 1"}, {title: "header 2"} // TODO: make variables from imported csv
-                    ];
-                    rows: [ // organized how it would view // TODO: automate populating table from csv // use set-current-row(int): Sets the current row by index and brings it into view.
-                        [
-                            { text: "Item 1" }, { text: "Item 2" }
-                        ],
-                        [
-                            { text: "Item 3" }, { text: "Item 4" }
-                        ],
-                        [
-                            { text: "Item 5" }, { text: "Item 6" }
-                        ]
-                    ];
+                    columns: header-data;
+                    rows: table-data;
                 }
             }
         }
