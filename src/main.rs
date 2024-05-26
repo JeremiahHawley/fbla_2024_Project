@@ -35,11 +35,11 @@ fn main() -> Result<(), slint::PlatformError> {
 
     // =================================================================================
     // =================================================================================
-    // TODO: FIX THIS THING SO THAT IT ACTUALLY WORKS IVE SPENT HOURS ON THIS LITERALLY (line 40: let body_model_rc ...)
+    // TODO: FIX THIS THING SO THAT IT ACTUALLY WORKS IVE SPENT HOURS ON THIS LITERALLY (line 42: let body_model_rc ...)
     // =================================================================================
     // =================================================================================
 
-    let body_model_rc: ModelRc<ModelRc<StandardListViewItem>> = ModelRc::from(Rc::new(body_model.clone()).into());
+    let body_model_rc: ModelRc<ModelRc<StandardListViewItem>> = ModelRc::from(body_model.clone().into());
     
     /*let body_model_rc = ModelRc::<ModelRc<StandardListViewItem>>::from(
         Into::<ModelRc<ModelRc<StandardListViewItem>>>::into(body_model.clone()).into()
@@ -56,7 +56,7 @@ fn main() -> Result<(), slint::PlatformError> {
     let header_model_rc = ModelRc::from(header_model.into());
     //ui.set_header_model(header_model_rc);
 
-    //let table_data: ModelRc<ModelRc<StandardListViewItem>> = ModelRc::<ModelRc<StandardListViewItem>>::new(From::<dyn,ModelRc<ModelRc<StandardListViewItem>>>::into(from_body));
+    //let body_model_rc: ModelRc<ModelRc<StandardListViewItem>> = ModelRc::<ModelRc<StandardListViewItem>>::new(From::<dyn,ModelRc<ModelRc<StandardListViewItem>>>::into(from_body));
 
     //let header_data: ModelRc<TableColumn> = ModelRc::<TableColumn>::new(from_header.into());
 
