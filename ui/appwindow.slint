@@ -25,8 +25,11 @@ fn main() {
 import { ComboBox, CheckBox, Button, StandardTableView } from "std-widgets.slint";
 export component AppWindow inherits Window {
     // `in` means that it is data that is taken into the widget but cannot be modified by the widget
+    /*
     in property <[[StandardListViewItem]]> table-data; // 2d vector of values excluding the header row
     in property <[TableColumn]> header-data; // 1d vector of values that is just the header row/column titles
+    */
+    in property <[[string]]> data;
 
     width: 1200px;
     height: 1000px;
@@ -140,6 +143,26 @@ export component AppWindow inherits Window {
             table_display := Rectangle { // use `StandardTableView` 
                 background: green;
 
+                GridLayout {
+                    spacing: 5px;
+                    for record_row in &data {
+                        for cell in record_row {
+                            Rectangle {
+                                background: blueviolet;
+                            }
+                        }
+                    }
+                    
+                }
+                
+                
+                
+                
+                
+                
+                
+                
+                /*
                 csv_display := StandardTableView {
                     
                     x: parent.x;
@@ -148,7 +171,7 @@ export component AppWindow inherits Window {
                     height: parent.height;
                     columns: header-data;
                     rows: table-data;
-                }
+                }*/
             }
         }
     }
