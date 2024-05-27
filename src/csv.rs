@@ -48,3 +48,32 @@ fn main(){
     let test_partner: Partner = create_partner(&test_row_vec);
     println!("{}",test_partner.return_name());
 }
+
+/*  TODO: implement these functions (may need to add header and body to function inputs)
+
+add row/record to csv file
+fn add_row(row: Vec<&str>) -> Vec<Vec<&str>> {}
+
+edit row/record in csv file
+fn edit_row(row: Vec<&str>) -> Vec<Vec<&str>> {// basically find the row and replace it?}// can change implementation
+
+delete row/record from csv file
+fn delete_row(row: Vec<&str>) -> Vec<Vec<&str>> {} // again, can choose how to implement, just make sure to communicate what the input is
+
+
+hide column from view (may need to implement separate functions for header (Vec<&str>) and body (Vec<Vec<&str>>))
+make sure to keep original to not lose data
+fn hide_column(column: &str) -> Vec<&str>, Vec<Vec<&str>> {}
+
+fn sort_csv_by_column(column: &str, order: &str) -> Vec<Vec<&str>> {
+    match order {
+        // implement different orders (asc, desc, etc) and call respective sort function for that column
+    }
+}
+
+
+
+
+
+
+*/
