@@ -1,6 +1,6 @@
 
 
-import { ComboBox, CheckBox, Button, StandardTableView } from "std-widgets.slint";
+import { ComboBox, CheckBox, Button, StandardTableView, HorizontalBox, LineEdit } from "std-widgets.slint";
 export component AppWindow inherits Window {
     // `in` means that it is data that is taken into the widget but cannot be modified by the widget
     
@@ -22,85 +22,129 @@ export component AppWindow inherits Window {
                 min-height: 50px;
                 max-height: 100px;
                 vertical-stretch: 0.25;
+
+                hamburger := Rectangle {
+                    background: blueviolet;
+                    x: parent.height*(0.175);
+                    y: self.x;
+                    width: parent.height*(0.65);
+                    height: self.width;
+                    TouchArea {
+                        clicked => { if (self.pressed){/* open menu*/} else {/*close menu*/}}
+                    }
+                }
                 
             }
 
             filter_options := Rectangle { // use a VerticalLayout of `ComboBox`
                 background: orange;
+
+                
+
+                Text {
+                    x: parent.width*(2/5);
+                    y: parent.height*(1/16);
+                    text: "Sort Options";
+                }
+                Text {
+                    x: parent.width*(1/4);
+                    y: parent.height*(3/32);
+                    text: "sort order";
+                }
+                Text {
+                    x: parent.width*(3/5);
+                    y: parent.height*(3/32);
+                    text: "column sorted";
+                }
                 sort_order := ComboBox {
-                    y: 0px;
+                    x: parent.width*(1/4);
+                    y: parent.height*(2/16);
                     width: self.preferred-width;
                     height: self.preferred-height;
                     model: ["first", "second", "third"]; // TODO: rename/create sort orders
                     current-value: "first";
+                    selected => {/*change sort order based on this and sort_column*/}
                 }
-                /*
+                sort_column := ComboBox {
+                    x: parent.width*(3/5);
+                    y: parent.height*(2/16);
+                    width: self.preferred-width;
+                    height: self.preferred-height;
+                    model: ["first", "second", "third"]; // TODO: rename/create sort orders
+                    current-value: "first";
+                    selected => {/* change sort order based on this and sort_order */}
+                }
+                
                 has_scholarship_filter := CheckBox {
-                    y: 50px;
-                    width: parent.width;
-                    height: parent.height;
+                    x: parent.width*(2/5);
+                    y: parent.height*(3/16);
+                    width: self.preferred-width;
+                    height: self.preferred-height;
                     text: "hasScholarship";
                 }
-                */
+                
 
-                // TODO: checkboxes for shown/hidden columns (under a text header)
                 Text {
-                    // TODO: size and location
+                    x: parent.width*(2/5);
+                    y: parent.height*(1/12) + parent.height*(1/5);
                     text: "Hide Columns";
                 }
 
                 is_name_hidden := CheckBox {
-                    x: parent.x + parent.width*(1/3);
-                    y: parent.y + parent.height*(1/8);
+                    x: parent.width*(1/4);
+                    y: parent.height*(1/8) + parent.height*(1/5);
                     width: 50px;
                     height: 50px;
                     text: "Name";
+                    toggled => { if (self.checked) {/*hide*/} else {/*unhide*/}}
                 }
                 is_value_hidden := CheckBox {
-                    x: parent.x + parent.width*(1/3);
-                    y: parent.y + parent.height*(2/8);
+                    x: parent.width*(1/4);
+                    y: parent.height*(2/8) + parent.height*(1/5);
                     width: 50px;
                     height: 50px;
                     text: "Value";
+                    toggled => { if (self.checked) {/*hide*/} else {/*unhide*/}}
                 }
                 is_type_hidden := CheckBox {
-                    x: parent.x + parent.width*(1/3);
-                    y: parent.y + parent.height*(3/8);
+                    x: parent.width*(1/4);
+                    y: parent.height*(3/8) + parent.height*(1/5);
                     width: 50px;
                     height: 50px;
                     text: "Type";
+                    toggled => { if (self.checked) {/*hide*/} else {/*unhide*/}}
                 }
                 is_phone_number_hidden := CheckBox {
-                    x: parent.x + parent.width*(1/3);
-                    y: parent.y + parent.height*(4/8);
+                    x: parent.width*(3/5);
+                    y: parent.height*(1/8) + parent.height*(1/5);
                     width: 50px;
                     height: 50px;
                     text: "Phone Number";
+                    toggled => { if (self.checked) {/*hide*/} else {/*unhide*/}}
                 }
                 is_address_hidden := CheckBox {
-                    x: parent.x + parent.width*(1/3);
-                    y: parent.y + parent.height*(5/8);
+                    x: parent.width*(3/5);
+                    y: parent.height*(2/8) + parent.height*(1/5);
                     width: 50px;
                     height: 50px;
                     text: "Address";
+                    toggled => { if (self.checked) {/*hide*/} else {/*unhide*/}}
                 }
                 is_scholarship_hidden := CheckBox {
-                    x: parent.x + parent.width*(1/3);
-                    y: parent.y + parent.height*(6/8);
+                    x: parent.width*(3/5);
+                    y: parent.height*(3/8) + parent.height*(1/5);
                     width: 50px;
                     height: 50px;
                     text: "Scholarship";
+                    toggled => { if (self.checked) {/*hide*/} else {/*unhide*/}}
                 }
-
-
-
             }
         }
 
         right_side := VerticalLayout { 
 
             add_new_record := Rectangle { // use `LineEdit` for text input, `CheckBox` for scholarship boolean, maybe others
-                background: blue;
+                background: white;
                 min-height: menu-option.min-height; // sets the dimensions to be the same as those of "menu_option"
                 vertical-stretch: menu-option.vertical-stretch;
 
@@ -108,20 +152,85 @@ export component AppWindow inherits Window {
                     x: parent.x + parent.width*(1/3);
                     y: parent.y + parent.height/2;
                     text: "add record";
+                    clicked => {/* open dialog to enter new values*/}
                 }
+
+                // TODO: add button to update/edit a record
+
                 delete_record := Button {
                     x: parent.x + parent.width*(2/3);
                     y: parent.y + parent.height/2;
                     text: "delete record";
+                    clicked => {/*select row to delete and delete it*/}
                 }
+                
+                HorizontalBox {
+                    x: parent.x;
+                    y: parent.y;
+                    width: parent.width;
+                    height: parent.height*(1/6);
+                    LineEdit {
+                        y: parent.y;
+                        height: parent.height;
+                        font-size: 14px;
+                        placeholder-text: "Name";
+                    }
+                    LineEdit {
+                        y: parent.y;
+                        height: parent.height;
+                        font-size: 14px;
+                        placeholder-text: "Value";
+                    }
+                    LineEdit {
+                        y: parent.y;
+                        height: parent.height;
+                        font-size: 14px;
+                        placeholder-text: "Type";
+                    }
+                }
+                HorizontalBox {
+                    x: parent.x;
+                    y: parent.height*(1/5);
+                    width: parent.width;
+                    height: parent.height*(1/6);
+                    LineEdit {
+                        y: parent.y;
+                        height: parent.height;
+                        font-size: 14px;
+                        placeholder-text: "Phone Number";
+                    }
+                    LineEdit {
+                        y: parent.y;
+                        height: parent.height;
+                        font-size: 14px;
+                        placeholder-text: "Address";
+                    }
+                    LineEdit {
+                        y: parent.y;
+                        height: parent.height;
+                        font-size: 14px;
+                        placeholder-text: "Scholarship";// add a y/n or true/false depending on csv since it is a boolean
+                    }
+                }
+                
 
-            }
+                 
+                }
+                    
+                
+        
+                
 
-            table_display := Rectangle { // use `StandardTableView` 
+
+                // TODO: add search menu bar thing that is like a single row where you can search for items by value like regex
+
+
+            
+
+            table_display := Rectangle { 
                 background: green;
 
                 csv_display := StandardTableView {
-                    
                     x: parent.x;
                     y: parent.y;
                     width: parent.width;
@@ -132,11 +241,12 @@ export component AppWindow inherits Window {
             }
         }
     }
-
-
-
-
 }
+
+
+
+
+
 
 
 
