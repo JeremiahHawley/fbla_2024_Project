@@ -163,7 +163,6 @@ pub fn load_from_csv(filepath: &str) -> Database {
     let mut new_database: Database = Database{
         partners: Vec::new(),
         headers: Vec::new(),
-
     };
     let file_string = file_to_string(filepath);
     let mut iterator: usize = 0;
@@ -188,7 +187,7 @@ pub fn load_from_csv(filepath: &str) -> Database {
     let mut two_vec: Vec<Vec<String>> = Vec::new(); 
     let mut pass_header: bool = false;
     let mut temp_vec: Vec<String> = Vec::new();
-    for (i, character) in file_string.chars().enumerate(){
+    for (i, character) in file_string.chars().enumerate(){ 
         if character == '\n'{ // TODO/DEBUG: SHOULD THIS ONLY BE \n?
             if !pass_header {
                 iterator = i+1;
@@ -197,7 +196,8 @@ pub fn load_from_csv(filepath: &str) -> Database {
             }else{
                 // add next value to temp_vec (representing a single row)
                 if character == ','{
-                    temp_vec.push(file_string[iterator..i].to_string());
+                    print!("{} ", file_string[iterator..i-1].to_string());
+                    temp_vec.push(file_string[iterator..i-1].to_string());
                     iterator = i+1;
                 }
                 // add complete row to two_vec and reset temp_vec
@@ -210,10 +210,11 @@ pub fn load_from_csv(filepath: &str) -> Database {
         }
     }
     // add two_vec to partners vector
+    /* 
     for partner in two_vec{
         // DEBUG/TODO: index out of bounds (partner[n])
         new_database.partners.push(Partner{name: partner[0].clone(), values: partner[1..].to_vec()});
-    }
+    }*/
     return new_database;
 }
 // Creates a new EMPTY database
