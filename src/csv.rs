@@ -50,8 +50,8 @@ impl Partner{
     }
 }
 pub struct Database {
-    partners: Vec<Partner>,
-    headers: Vec<String>,
+    pub partners: Vec<Partner>,
+    pub headers: Vec<String>,
 }
 impl Database {
     pub fn add_column(mut self, header: &str){
@@ -125,6 +125,7 @@ impl Database {
     pub fn save_to_csv(){
 
     }
+    /* 
     pub fn load_from_csv(self,filepath: &str){
         let new_database: Database = Database{
             partners: Vec::new(),
@@ -148,6 +149,7 @@ impl Database {
             }
         }
     }
+    */
     pub fn hide_row(){
 
     }

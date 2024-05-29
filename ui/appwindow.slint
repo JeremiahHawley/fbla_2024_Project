@@ -30,16 +30,21 @@ export component AppWindow inherits Window {
                     width: parent.height*(0.65);
                     height: self.width;
                     TouchArea {
-                        clicked => { if (self.pressed){/* open menu*/} else {/*close menu*/}}
+                        clicked => { 
+                            if (self.pressed){
+                                /* open menu */
+                            } else {
+                                /* close menu */
+                            }
+                        }
                     }
+
                 }
                 
             }
 
-            filter_options := Rectangle { // use a VerticalLayout of `ComboBox`
+            filter_options := Rectangle { 
                 background: orange;
-
-                
 
                 Text {
                     x: parent.width*(2/5);
@@ -169,23 +174,32 @@ export component AppWindow inherits Window {
                     y: parent.y;
                     width: parent.width;
                     height: parent.height*(1/6);
-                    LineEdit {
+                    inbox-name := LineEdit {
                         y: parent.y;
                         height: parent.height;
                         font-size: 14px;
                         placeholder-text: "Name";
+                        accepted => {
+                            self.select-all() /* export to name part of search function */
+                        }
                     }
-                    LineEdit {
+                    inbox-value := LineEdit {
                         y: parent.y;
                         height: parent.height;
                         font-size: 14px;
                         placeholder-text: "Value";
+                        accepted => {
+                            self.select-all() /* export to value part of search function */
+                        }
                     }
-                    LineEdit {
+                    inbox-type := LineEdit {
                         y: parent.y;
                         height: parent.height;
                         font-size: 14px;
                         placeholder-text: "Type";
+                        accepted => {
+                            self.select-all() /* export to type part of search function */
+                        }
                     }
                 }
                 HorizontalBox {
@@ -193,23 +207,32 @@ export component AppWindow inherits Window {
                     y: parent.height*(1/5);
                     width: parent.width;
                     height: parent.height*(1/6);
-                    LineEdit {
+                    inbox-phone-number := LineEdit {
                         y: parent.y;
                         height: parent.height;
                         font-size: 14px;
                         placeholder-text: "Phone Number";
+                        accepted => {
+                            self.select-all() /* export to phone-number part of search function */
+                        }
                     }
-                    LineEdit {
+                    inbox-address := LineEdit {
                         y: parent.y;
                         height: parent.height;
                         font-size: 14px;
                         placeholder-text: "Address";
+                        accepted => {
+                            self.select-all() /* export to address part of search function */
+                        }
                     }
-                    LineEdit {
+                    inbox-scholarship := LineEdit {
                         y: parent.y;
                         height: parent.height;
                         font-size: 14px;
                         placeholder-text: "Scholarship";// add a y/n or true/false depending on csv since it is a boolean
+                        accepted => {
+                            self.select-all() /* export to scholarship part of search function */
+                        }
                     }
                 }
                 
@@ -237,6 +260,12 @@ export component AppWindow inherits Window {
                     height: parent.height;
                     columns: header-data;
                     rows: table-data;
+                    sort-ascending => {
+                        // sort ascending by column
+                    }
+                    sort-descending => {
+                        // sort decending by column
+                    }
                 }
             }
         }

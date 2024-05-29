@@ -18,6 +18,8 @@ use std::rc::Rc;
 fn main() -> Result<(), slint::PlatformError> {
     let ui = AppWindow::new()?;
 
+
+
     // This can be set the the Vec<&str> of headers from the csv file
     let header_list: Vec<&str> = vec![ 
         // test data
@@ -35,6 +37,20 @@ fn main() -> Result<(), slint::PlatformError> {
     ];
 
 
+    // TODO: create database from csv
+    /* 
+    let database = csv::Database {
+        partners: body_list, // TODO: set these to the data from the csv
+        headers: header_list,  // TODO: set these to the data from the csv
+    };
+    */
+
+
+
+
+    
+
+
     // Convert the data from the csv file into types that slint uses
     let transformed_header_list = transform_header_list(header_list);
     let transformed_body_list = transform_body_list(body_list);    
@@ -42,6 +58,7 @@ fn main() -> Result<(), slint::PlatformError> {
     // Set the table data
     ui.set_header_data(transformed_header_list); // Column headers
     ui.set_table_data(transformed_body_list); // All other cells
+
   
     
 
@@ -54,6 +71,22 @@ fn main() -> Result<(), slint::PlatformError> {
 
     ui.run()
 }
+
+
+
+
+
+
+
+
+fn get_help_text() -> SharedString {
+    // create string from txt file
+    let help_text = include_str!("help.txt");
+    let help_text = help_text.to_string();
+    let help_text = SharedString::from(help_text);
+    return help_text;
+}
+
 
 fn transform_header_list(header_list: Vec<&str>) -> ModelRc<TableColumn> {
     // THIS WORKS DON'T TOUCH
