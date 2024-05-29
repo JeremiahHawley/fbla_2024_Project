@@ -34,7 +34,9 @@ fn sort_csv_by_column(column: &str, order: &str) -> Vec<Vec<&str>> {
 use std::fs::File;
 use std::io::{self, Read, BufReader, Write};
 
-const FILE_PATH: &str = "test.csv";
+const FILE_PATH: &str = "src/test.csv";
+
+
 pub struct Partner {
     name: String,
     values: Vec<String>,
@@ -52,6 +54,7 @@ impl Partner{
         return Partner{name: self.name.clone(), values: self.values.clone()};
     }
 }
+
 pub struct Database {
     partners: Vec<Partner>,
     headers: Vec<String>,
@@ -136,51 +139,8 @@ impl Database {
         }
         write_to_csv(FILE_PATH, &mut string_to_write)
     }
-    pub fn load_from_csv(mut self,filepath: &str){
-        let mut new_database: Database = Database{
-            partners: Vec::new(),
-            headers: Vec::new(),
-
-        };
-        let file_string = file_to_string(filepath);
-        let mut iterator: usize = 0;
-        let char_vec = string_to_char_vec(&file_string);
-        loop {
-            if char_vec[iterator] == &'\n'.to_string() {
-                break;
-            }
-            iterator +=1;
-        }
-        let header_row = file_string[0..iterator].to_string();
-        iterator = 0;
-        for (i, character) in header_row.chars().enumerate() {
-            if character == ','{
-                new_database.headers.push(header_row[iterator..i].to_string());
-                iterator = i+1;
-            }
-        }
-        iterator = 0;
-        let mut two_vec: Vec<Vec<String>> = Vec::new(); 
-        let mut pass_header: bool = false;
-        let mut temp_vec: Vec<String> = Vec::new();
-        for (i, character) in file_string.chars().enumerate(){
-            if character == '\n' || character == ','{
-                if !pass_header {
-                    iterator = i+1;
-                    pass_header = true;
-                    continue;
-                }else{
-                    if character == ','{
-                        temp_vec.push(file_string[iterator..(i-1)].to_string());
-                    }
-                    if character == '\n'{
-                        two_vec.push(temp_vec);
-                        temp_vec = Vec::new();
-                    }
-                }
-            }
-        }
-    }
+    
+    // Returns a new database with the specified row hidden
     pub fn hide_row(self, name: &String) -> Database{
         let mut temp_database:Database = Database{
             partners: Vec::new(),
@@ -199,8 +159,64 @@ impl Database {
     }
 }
 
+pub fn load_from_csv(filepath: &str) -> Database {
+    let mut new_database: Database = Database{
+        partners: Vec::new(),
+        headers: Vec::new(),
 
-
+    };
+    let file_string = file_to_string(filepath);
+    let mut iterator: usize = 0;
+    let char_vec = string_to_char_vec(&file_string);
+    // find header row
+    loop {
+        if iterator >= char_vec.len() || char_vec[iterator] == &'\n'.to_string() {
+            break;
+        }
+        iterator +=1;
+    }
+    let header_row = file_string[0..iterator].to_string();
+    iterator = 0;
+    // add headers to database
+    for (i, character) in header_row.chars().enumerate() {
+        if character == ','{
+            new_database.headers.push(header_row[iterator..i].to_string());
+            iterator = i+1;
+        }
+    }
+    iterator = 0;
+    let mut two_vec: Vec<Vec<String>> = Vec::new(); 
+    let mut pass_header: bool = false;
+    let mut temp_vec: Vec<String> = Vec::new();
+    for (i, character) in file_string.chars().enumerate(){
+        if character == '\n'{ // TODO/DEBUG: SHOULD THIS ONLY BE \n?
+            if !pass_header {
+                iterator = i+1;
+                pass_header = true;
+                continue;
+            }else{
+                // add next value to temp_vec (representing a single row)
+                if character == ','{
+                    temp_vec.push(file_string[iterator..i].to_string());
+                    iterator = i+1;
+                }
+                // add complete row to two_vec and reset temp_vec
+                if character == '\n'{
+                    two_vec.push(temp_vec);
+                    temp_vec = Vec::new();
+                    //iterator = i+1; // TODO/DEBUG: should this be here?
+                }
+            }
+        }
+    }
+    // add two_vec to partners vector
+    for partner in two_vec{
+        // DEBUG/TODO: index out of bounds (partner[n])
+        new_database.partners.push(Partner{name: partner[0].clone(), values: partner[1..].to_vec()});
+    }
+    return new_database;
+}
+// Creates a new EMPTY database
 pub fn new_database() -> Database{
     return Database{partners: vec![Partner{name: "".to_string(), values: Vec::new()}], headers: Vec::new()};
 }
@@ -240,6 +256,7 @@ pub fn db_to_2d_vec(db: Database) -> Vec<Vec<String>> {
         let mut temp_vector: Vec<String> = Vec::new(); 
         temp_vector.push(partner.name.clone());
         for value in partner.values{
+            //print!("{} ", value); // DEBUG: partner.values is not populated
             temp_vector.push(value);
         }
         return_vector.push(temp_vector);

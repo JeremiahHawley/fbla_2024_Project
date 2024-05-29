@@ -11,7 +11,7 @@ fn main() {
 
 slint::include_modules!();
 use slint::{ ModelRc, StandardListViewItem, TableColumn, VecModel, SharedString};
-use std::rc::Rc;
+use std::{rc::Rc, string};
 
 
 
@@ -20,21 +20,7 @@ fn main() -> Result<(), slint::PlatformError> {
 
 
 
-    // This can be set the the Vec<&str> of headers from the csv file
-    let header_list: Vec<&str> = vec![ 
-        // test data
-        "Header 1",
-        "Header 2",
-        "Header 3"
-    ];
-
-    // This can be set to the Vec<Vec<&str>> of rows from the csv file
-    let body_list: Vec<Vec<&str>> = vec![ 
-        // test data
-        vec!["1", "2", "3"],
-        vec!["4", "5", "6"],
-        vec!["7", "8", "9"],
-    ];
+    
 
 
     // TODO: create database from csv
@@ -46,6 +32,36 @@ fn main() -> Result<(), slint::PlatformError> {
     */
 
 
+    // DEBUG: it appears that the body of the csv is not being loaded into the database
+    let mut database: csv::Database = csv::new_database();
+    database = csv::load_from_csv("src/test.csv");
+
+    let two_vec: Vec<Vec<String>> = csv::db_to_2d_vec(database);
+    
+    print!("two_vec length: {} \n", two_vec.len());//DEBUG purposes
+
+    
+
+    let header_list: Vec<String> = two_vec[0].clone();
+    let mut body_list: Vec<Vec<String>> = Vec::new();
+    for row in two_vec.iter() {
+        if row == &two_vec[0] {
+            continue;
+        }
+        body_list.push(row.to_vec());
+    }
+    
+    //two_vec[1..].to_vec();
+
+
+    for row in two_vec.iter() {
+        for cell in row.iter() {
+            println!("{}", cell);
+        }
+    }
+
+    print!("header_list: {:?}", header_list);
+    print!("body_list: {:?}", body_list);
 
 
     
@@ -88,9 +104,9 @@ fn get_help_text() -> SharedString {
 }
 
 
-fn transform_header_list(header_list: Vec<&str>) -> ModelRc<TableColumn> {
+fn transform_header_list(header_list: Vec<String>) -> ModelRc<TableColumn> {
     // THIS WORKS DON'T TOUCH
-    let header_transition1: Vec<TableColumn> = header_list.into_iter().map(|cell: &str| {
+    let header_transition1: Vec<TableColumn> = header_list.into_iter().map(|cell: String| {
         let mut column: TableColumn = TableColumn::default();
         column.title = SharedString::from(cell);
         column
@@ -101,11 +117,11 @@ fn transform_header_list(header_list: Vec<&str>) -> ModelRc<TableColumn> {
     return header_transition_final;
 }
 
-fn transform_body_list(body_list: Vec<Vec<&str>>) -> ModelRc<ModelRc<StandardListViewItem>> {
+fn transform_body_list(body_list: Vec<Vec<String>>) -> ModelRc<ModelRc<StandardListViewItem>> {
     // THIS WORKS DON'T TOUCH
-    let body_transition1: Vec<Vec<StandardListViewItem>> = body_list.into_iter().map(|row: Vec<&str>| {
-        row.into_iter().map(|cell: &str| {
-            StandardListViewItem::from(SharedString::from(cell.to_string()))
+    let body_transition1: Vec<Vec<StandardListViewItem>> = body_list.into_iter().map(|row: Vec<String>| {
+        row.into_iter().map(|cell: String| {
+            StandardListViewItem::from(SharedString::from(cell))
         }).collect()
     }).collect();
     let body_transition2: Vec<VecModel<StandardListViewItem>> = body_transition1.into_iter().map(|row: Vec<StandardListViewItem>| {
