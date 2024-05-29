@@ -32,8 +32,7 @@ fn sort_csv_by_column(column: &str, order: &str) -> Vec<Vec<&str>> {
 */
 
 use std::fs::File;
-use std::io::{self, Read, BufReader};
-use std::iter;
+use std::io::{self, Read, BufReader, Write};
 
 const FILE_PATH: &str = "test.csv";
 pub struct Partner {
@@ -126,8 +125,16 @@ impl Database {
         }
         self.partners[name_index].values[header_index] = value.clone() ;
     }
-    pub fn save_to_csv(){
-
+    pub fn save_to_csv(self) -> io::Result<()> {
+        let mut string_to_write = String::new();
+        let two_vec: Vec<Vec<String>> = db_to_2d_vec(self);
+        for vector in two_vec {
+            for string in vector {
+                string_to_write += string.as_str();
+            }
+            string_to_write += "\n";
+        }
+        write_to_csv(FILE_PATH, &mut string_to_write)
     }
     pub fn load_from_csv(mut self,filepath: &str){
         let mut new_database: Database = Database{
@@ -239,6 +246,12 @@ pub fn db_to_2d_vec(db: Database) -> Vec<Vec<String>> {
     }
     return return_vector;
 }
+fn write_to_csv(file_path: &str, text: &str) -> io::Result<()> {
+    let mut file = File::create(file_path)?;    
+    file.write_all(text.as_bytes())?;
+    Ok(())
+}
+
 fn string_to_char_vec(string: &str) -> Vec<&str>{
     // Collecting the character slices into a Vec<&str>
     let char_slices: Vec<&str> = string.chars().map(|c| {
