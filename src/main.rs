@@ -37,7 +37,7 @@ fn main() -> Result<(), slint::PlatformError> {
     database = csv::load_from_csv("src/test.csv");
 
     let two_vec: Vec<Vec<String>> = csv::db_to_2d_vec(database);
-    
+
     print!("two_vec length: {} \n", two_vec.len());//DEBUG purposes
 
     
@@ -45,7 +45,7 @@ fn main() -> Result<(), slint::PlatformError> {
     let header_list: Vec<String> = two_vec[0].clone();
     let mut body_list: Vec<Vec<String>> = Vec::new();
     for row in two_vec.iter() {
-        if row == &two_vec[0] {
+        if row == &two_vec[0] { // DEBUG: This works properly
             continue;
         }
         body_list.push(row.to_vec());
@@ -53,12 +53,12 @@ fn main() -> Result<(), slint::PlatformError> {
     
     //two_vec[1..].to_vec();
 
-
+/* 
     for row in two_vec.iter() {
         for cell in row.iter() {
             println!("{}", cell);
         }
-    }
+    }*/
 
     print!("header_list: {:?}", header_list);
     print!("body_list: {:?}", body_list);

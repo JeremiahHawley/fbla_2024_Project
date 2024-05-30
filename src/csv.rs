@@ -169,7 +169,10 @@ pub fn load_from_csv(filepath: &str) -> Database {
     let char_vec = string_to_char_vec(&file_string);
     // find header row
     loop {
-        if iterator >= char_vec.len() || char_vec[iterator] == &'\n'.to_string() {
+        if iterator >= char_vec.len() {
+            break;
+        } else if char_vec[iterator] == &'\n'.to_string() {
+            iterator += 1;
             break;
         }
         iterator +=1;
@@ -178,7 +181,7 @@ pub fn load_from_csv(filepath: &str) -> Database {
     iterator = 0;
     // add headers to database
     for (i, character) in header_row.chars().enumerate() {
-        if character == ','{
+        if character == ',' || character == '\n'{
             new_database.headers.push(header_row[iterator..i].to_string());
             iterator = i+1;
         }
@@ -187,34 +190,48 @@ pub fn load_from_csv(filepath: &str) -> Database {
     let mut two_vec: Vec<Vec<String>> = Vec::new(); 
     let mut pass_header: bool = false;
     let mut temp_vec: Vec<String> = Vec::new();
-    for (i, character) in file_string.chars().enumerate(){ 
-        if character == '\n'{ // TODO/DEBUG: SHOULD THIS ONLY BE \n?
+    for (i, character) in file_string.chars().enumerate(){ //  ======= THE CSV FILE MUST END WITH A '\n' IN ORDER TO THE LAST LINE TO BE PUSHED TO THE VECTOR
+        if character == '\n' || character == ','{ // it needs the "," part to work
             if !pass_header {
+                if character == '\n' {
+                    pass_header = true;
+                }
                 iterator = i+1;
-                pass_header = true;
                 continue;
-            }else{
+            }else{ // in the main body (past header)
                 // add next value to temp_vec (representing a single row)
                 if character == ','{
-                    print!("{} ", file_string[iterator..i-1].to_string());
-                    temp_vec.push(file_string[iterator..i-1].to_string());
+                    //print!("{} ", file_string[iterator..i].to_string());
+                    temp_vec.push(file_string[iterator..i].to_string());
                     iterator = i+1;
                 }
                 // add complete row to two_vec and reset temp_vec
                 if character == '\n'{
+                    temp_vec.push(file_string[iterator..i].to_string()); // add last value because csv does not end lines with ','
                     two_vec.push(temp_vec);
                     temp_vec = Vec::new();
-                    //iterator = i+1; // TODO/DEBUG: should this be here?
+                    iterator = i+1; // TODO/DEBUG: should this be here?
                 }
             }
         }
     }
     // add two_vec to partners vector
-    /* 
-    for partner in two_vec{
+     
+    for row in two_vec{
+        println!("Row contents:{:?}", row);
         // DEBUG/TODO: index out of bounds (partner[n])
-        new_database.partners.push(Partner{name: partner[0].clone(), values: partner[1..].to_vec()});
-    }*/
+        if row.len() == 0{
+            println!("broke");
+            continue;
+        }
+        let partner = Partner {
+            name: row[0].clone(),
+            values: row[1..row.len()].to_vec()
+        };
+        println!("success");
+        new_database.partners.push(partner);
+
+    }
     return new_database;
 }
 // Creates a new EMPTY database
