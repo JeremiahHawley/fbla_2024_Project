@@ -1,11 +1,13 @@
 
-
 import { ComboBox, CheckBox, Button, StandardTableView, HorizontalBox, LineEdit } from "std-widgets.slint";
 export component AppWindow inherits Window {
     // `in` means that it is data that is taken into the widget but cannot be modified by the widget
     
     in property <[[StandardListViewItem]]> table-data; // 2d vector of values excluding the header row
     in property <[TableColumn]> header-data; // 1d vector of values that is just the header row/column titles
+
+    callback hide_column(string);
+    callback show_column(string);
     
 
     width: 1200px;
@@ -23,7 +25,7 @@ export component AppWindow inherits Window {
                 max-height: 100px;
                 vertical-stretch: 0.25;
 
-                hamburger := Rectangle {
+                hamburger := Rectangle { // TODO: ADD SAVE BUTTON
                     background: blueviolet;
                     x: parent.height*(0.175);
                     y: self.x;
@@ -101,7 +103,7 @@ export component AppWindow inherits Window {
                     width: 50px;
                     height: 50px;
                     text: "Name";
-                    toggled => { if (self.checked) {/*hide*/} else {/*unhide*/}}
+                    toggled => { if (self.checked) {hide_column(self.text)} else {show_column(self.text)}}
                 }
                 is_value_hidden := CheckBox {
                     x: parent.width*(1/4);
@@ -109,7 +111,7 @@ export component AppWindow inherits Window {
                     width: 50px;
                     height: 50px;
                     text: "Value";
-                    toggled => { if (self.checked) {/*hide*/} else {/*unhide*/}}
+                    toggled => { if (self.checked) {hide_column(self.text)} else {/*unhide*/}}
                 }
                 is_type_hidden := CheckBox {
                     x: parent.width*(1/4);
@@ -117,7 +119,7 @@ export component AppWindow inherits Window {
                     width: 50px;
                     height: 50px;
                     text: "Type";
-                    toggled => { if (self.checked) {/*hide*/} else {/*unhide*/}}
+                    toggled => { if (self.checked) {hide_column(self.text)} else {/*unhide*/}}
                 }
                 is_phone_number_hidden := CheckBox {
                     x: parent.width*(3/5);
@@ -125,7 +127,7 @@ export component AppWindow inherits Window {
                     width: 50px;
                     height: 50px;
                     text: "Phone Number";
-                    toggled => { if (self.checked) {/*hide*/} else {/*unhide*/}}
+                    toggled => { if (self.checked) {hide_column(self.text)} else {/*unhide*/}}
                 }
                 is_address_hidden := CheckBox {
                     x: parent.width*(3/5);
@@ -133,7 +135,7 @@ export component AppWindow inherits Window {
                     width: 50px;
                     height: 50px;
                     text: "Address";
-                    toggled => { if (self.checked) {/*hide*/} else {/*unhide*/}}
+                    toggled => { if (self.checked) {hide_column(self.text)} else {/*unhide*/}}
                 }
                 is_scholarship_hidden := CheckBox {
                     x: parent.width*(3/5);
@@ -141,7 +143,7 @@ export component AppWindow inherits Window {
                     width: 50px;
                     height: 50px;
                     text: "Scholarship";
-                    toggled => { if (self.checked) {/*hide*/} else {/*unhide*/}}
+                    toggled => { if (self.checked) {hide_column(self.text)} else {/*unhide*/}}
                 }
             }
         }

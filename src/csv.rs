@@ -32,11 +32,13 @@ fn sort_csv_by_column(column: &str, order: &str) -> Vec<Vec<&str>> {
 */
 
 use std::fs::File;
+use std::rc::Rc;
+use std::cell::RefCell;
 use std::io::{self, Read, BufReader, Write};
 
 const FILE_PATH: &str = "src/test.csv";
 
-
+#[derive(Clone)] // allows Partner to be cloned
 pub struct Partner {
     name: String,
     values: Vec<String>,
@@ -55,6 +57,7 @@ impl Partner{
     }
 }
 
+#[derive(Clone)]
 pub struct Database {
     partners: Vec<Partner>,
     headers: Vec<String>,
@@ -66,16 +69,56 @@ impl Database {
             self.partners[i].values.push("N/A".to_string());
         }
     }
-    pub fn delete_column(mut self, header: &str){
-        let mut index: usize = 0; 
-        for data_type in &self.headers{
-            if data_type == header{
+    pub fn show_column(mut self, database: &Rc<RefCell<Database>>, header: slint::SharedString) -> Database {
+        let database = database.borrow();
+        let header = header.to_string();
+        let mut temp_database: Database = Database {
+            partners: database.partners.clone(),
+            headers: database.headers.clone(),
+        };
+        let mut index: usize = 0;
+        for data_type in self.headers {
+            if data_type.to_ascii_lowercase() == header.to_ascii_lowercase() {
                 break;
             }
             index += 1;
         }
-        self.headers.remove(index);
+
+        temp_database.headers.insert(index, header.to_string());
+        // if name, add name, then do others
+        if header == "Name" {
+            for i in 0..(temp_database.partners.len() - 1) {
+                temp_database.partners[i].name = self.partners[i].name.clone();
+            }
+        } else {
+            for i in 0..(temp_database.partners.len() - 1) {
+                temp_database.partners[i].values.insert(index-1, self.partners[i].values[index-1].clone());
+            }
+        }
+        return temp_database;
     }
+    pub fn delete_column(mut self, database: &Rc<RefCell<Database>>, header: slint::SharedString) -> Database {
+        let database = database.borrow();
+        let header = header.to_string();
+        let mut temp_database: Database = Database {
+            partners: database.partners.clone(),
+            headers: database.headers.clone(),
+        };
+        let mut index: usize = 0; 
+        for data_type in &temp_database.headers{
+            if data_type.to_ascii_lowercase() == header.to_ascii_lowercase(){ // BUG: this is never true for the case
+                print!("found matching header: {}", data_type); // DEBUG
+                break;
+            }
+            index += 1;
+        }
+        temp_database.headers.remove(if (index > 0) { index - 1 } else { 0 });
+        for i in 0..temp_database.partners.len() { 
+            temp_database.partners[i].values.remove(if (index > 0) { index - 2 } else { 0 });
+        }
+        return temp_database;
+    }
+
     pub fn add_row(mut self, name: &String){
         self.partners.push(
             Partner { 
@@ -154,8 +197,18 @@ impl Database {
         return temp_database;
     }
 
-    pub fn sort_by_column(){
+    /* SHOULDNT NEED THIS (use delete_column) 
+    pub fn hide_column(self, header: &str) -> Database{
+        let mut temp_database: Database = Database {
+            partners: Vec::new(),
+            headers: Vec::new(),
+        };
 
+        return temp_database;
+    }
+    */
+    pub fn sort_by_column(){
+        // TODO: implement FUNCTION ===================================================================
     }
 }
 
@@ -201,7 +254,6 @@ pub fn load_from_csv(filepath: &str) -> Database {
             }else{ // in the main body (past header)
                 // add next value to temp_vec (representing a single row)
                 if character == ','{
-                    //print!("{} ", file_string[iterator..i].to_string());
                     temp_vec.push(file_string[iterator..i].to_string());
                     iterator = i+1;
                 }
@@ -210,25 +262,20 @@ pub fn load_from_csv(filepath: &str) -> Database {
                     temp_vec.push(file_string[iterator..i].to_string()); // add last value because csv does not end lines with ','
                     two_vec.push(temp_vec);
                     temp_vec = Vec::new();
-                    iterator = i+1; // TODO/DEBUG: should this be here?
+                    iterator = i+1; 
                 }
             }
         }
     }
     // add two_vec to partners vector
-     
     for row in two_vec{
-        println!("Row contents:{:?}", row);
-        // DEBUG/TODO: index out of bounds (partner[n])
         if row.len() == 0{
-            println!("broke");
             continue;
         }
         let partner = Partner {
             name: row[0].clone(),
             values: row[1..row.len()].to_vec()
         };
-        println!("success");
         new_database.partners.push(partner);
 
     }
@@ -274,7 +321,6 @@ pub fn db_to_2d_vec(db: Database) -> Vec<Vec<String>> {
         let mut temp_vector: Vec<String> = Vec::new(); 
         temp_vector.push(partner.name.clone());
         for value in partner.values{
-            //print!("{} ", value); // DEBUG: partner.values is not populated
             temp_vector.push(value);
         }
         return_vector.push(temp_vector);

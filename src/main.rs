@@ -10,8 +10,10 @@ fn main() {
 */
 
 slint::include_modules!();
+use csv::Database;
 use slint::{ ModelRc, StandardListViewItem, TableColumn, VecModel, SharedString};
-use std::{rc::Rc, string};
+use std::rc::Rc;
+use std::cell::RefCell;
 
 
 
@@ -19,67 +21,41 @@ fn main() -> Result<(), slint::PlatformError> {
     let ui = AppWindow::new()?;
 
 
+    let mut reference_database: Rc<RefCell<csv::Database>> = Rc::new(RefCell::new(csv::new_database())); // initial reference database. csv::new_database();
+    reference_database = Rc::new(RefCell::new(csv::load_from_csv("src/test.csv")));
 
+    update_table_display_from_database(&ui, &reference_database); // initial table display
     
+    // Rc is used for multiple ownership so that it can be passed to the callbacks
+    // RefCell is used so these other owners can mutate the database
+    let working_database = reference_database.clone(); // initial working database
 
-
-    // TODO: create database from csv
-    /* 
-    let database = csv::Database {
-        partners: body_list, // TODO: set these to the data from the csv
-        headers: header_list,  // TODO: set these to the data from the csv
-    };
-    */
-
-
-    // DEBUG: it appears that the body of the csv is not being loaded into the database
-    let mut database: csv::Database = csv::new_database();
-    database = csv::load_from_csv("src/test.csv");
-
-    let two_vec: Vec<Vec<String>> = csv::db_to_2d_vec(database);
-
-    print!("two_vec length: {} \n", two_vec.len());//DEBUG purposes
-
+    // DEFINE CALLBACKS
+    let ui_handle = ui.as_weak();
+    //let working_database_clone: Rc<RefCell<csv::Database>> = Rc::clone(&working_database);
+    ui.on_hide_column(move |input: slint::SharedString| {
+        let ui = ui_handle.upgrade().unwrap();
+        let mut db = working_database.borrow_mut();
+        *db = Rc::new(RefCell::new(reference_database.borrow().clone().delete_column(&db.clone(), input)));
+        update_table_display_from_database(&ui, &db);
+    });
     
+    let ui_handle = ui.as_weak();
+    //let working_database_clone = Rc::clone(&working_database);
+    ui.on_show_column(move |input: slint::SharedString| {
+        let ui = ui_handle.upgrade().unwrap();
+        let mut db = working_database.borrow_mut();
+        *db = Rc::new(RefCell::new(reference_database.borrow().clone().show_column(&db.clone(), input)));
+        update_table_display_from_database(&ui, &db);
+    });
 
-    let header_list: Vec<String> = two_vec[0].clone();
-    let mut body_list: Vec<Vec<String>> = Vec::new();
-    for row in two_vec.iter() {
-        if row == &two_vec[0] { // DEBUG: This works properly
-            continue;
-        }
-        body_list.push(row.to_vec());
-    }
-    
-    //two_vec[1..].to_vec();
 
-/* 
-    for row in two_vec.iter() {
-        for cell in row.iter() {
-            println!("{}", cell);
-        }
-    }*/
-
-    print!("header_list: {:?}", header_list);
-    print!("body_list: {:?}", body_list);
 
 
     
 
 
-    // Convert the data from the csv file into types that slint uses
-    let transformed_header_list = transform_header_list(header_list);
-    let transformed_body_list = transform_body_list(body_list);    
-
-    // Set the table data
-    ui.set_header_data(transformed_header_list); // Column headers
-    ui.set_table_data(transformed_body_list); // All other cells
-
-  
-    
-
-
-    let ui_handle = ui.as_weak(); // currently unused but will be used for interactive ui
+    //let ui_handle = ui.as_weak(); // currently unused but will be used for interactive ui
     /* ui. on_request_increase_value (move || {
         let ui = ui_handle.unwrap();
         ui. set_counter(ui.get_counter () + 1);
@@ -90,6 +66,27 @@ fn main() -> Result<(), slint::PlatformError> {
 
 
 
+fn update_table_display_from_database(ui: &AppWindow, database: &Rc<RefCell<csv::Database>>) {
+    let database: Database = database.borrow().clone();
+    let mut header_list: Vec<String> = header_list_from_database(database.clone());
+    let mut body_list: Vec<Vec<String>> = body_list_from_database(database.clone());
+
+    // Convert the data from the csv file into types that slint uses
+    let transformed_header_list = transform_header_list(header_list);
+    let transformed_body_list = transform_body_list(body_list); 
+
+    // Set the table data
+    ui.set_header_data(transformed_header_list); // Column headers
+    ui.set_table_data(transformed_body_list); // All other cells
+}
+
+
+fn header_list_from_database(database: csv::Database) -> Vec<String> {
+    return csv::db_to_2d_vec(database)[0].clone();
+}
+fn body_list_from_database(database: csv::Database) -> Vec<Vec<String>> {
+    return csv::db_to_2d_vec(database)[1..].to_vec();
+}
 
 
 
