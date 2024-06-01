@@ -21,6 +21,87 @@ fn main() -> Result<(), slint::PlatformError> {
     let ui = AppWindow::new()?;
 
 
+    // MUST USE RC AND REFCELL
+
+    let mut reference_database: Rc<RefCell<Database>> = Rc::new(RefCell::new(csv::load_from_csv("src/test.csv")));
+
+    update_table_display_from_database(&ui, &reference_database.borrow()); // initial table display
+
+    // Rc is used for multiple ownership so that it can be passed to the callbacks
+    // RefCell is used so these other owners can mutate the database
+
+    let working_database: Rc<RefCell<Database>> = Rc::new(RefCell::new(reference_database.borrow().clone())); // initial working database
+
+
+    // DEFINE CALLBACKS
+
+    let ui_handle = ui.as_weak();
+    ui.on_hide_column(|input: SharedString| {
+        if let Some(ui) = ui_handle.upgrade() {
+            let mut temp_database = working_database.borrow_mut();
+            *temp_database = reference_database.borrow().delete_column(&temp_database.clone(), input);
+            update_table_display_from_database(&ui, &working_database.borrow());
+        }
+    });
+
+    let ui_handle = ui.as_weak();
+    ui.on_show_column(|input: SharedString| {
+        if let Some(ui) = ui_handle.upgrade() {
+            let mut temp_database = working_database.borrow_mut();
+            *temp_database = reference_database.borrow().show_column(&temp_database.clone(), input);
+            update_table_display_from_database(&ui, &working_database.borrow());
+        }
+    });
+
+
+
+
+
+
+
+/* 
+    let mut reference_database: csv::Database = csv::new_database(); // initial reference database. csv::new_database();
+    reference_database = csv::load_from_csv("src/test.csv");
+
+    update_table_display_from_database(&ui, &reference_database); // initial table display
+    
+    // Rc is used for multiple ownership so that it can be passed to the callbacks
+    // RefCell is used so these other owners can mutate the database
+    let mut working_database = reference_database.clone(); // initial working database
+
+    // DEFINE CALLBACKS
+    let ui_handle = ui.as_weak();
+    //let working_database_clone: Rc<RefCell<csv::Database>> = Rc::clone(&working_database);
+    ui.on_hide_column( |input: slint::SharedString| {
+        let ui = ui_handle.upgrade().unwrap();
+        let temp_database = &mut working_database;
+        *temp_database = reference_database.clone().delete_column(&temp_database.clone(), input);
+        update_table_display_from_database(&ui, &working_database.clone());
+    });
+    
+
+
+    let ui_handle = ui.as_weak();
+    //let working_database_clone = Rc::clone(&working_database);
+    ui.on_show_column( |input: slint::SharedString| {
+        let ui = ui_handle.upgrade().unwrap();
+        let temp_database = &mut working_database;
+        *temp_database = reference_database.clone().show_column(&temp_database.clone(), input);
+        update_table_display_from_database(&ui, &working_database.clone());
+    });
+*/
+
+
+
+
+
+
+
+
+
+
+
+    /* 
     let mut reference_database: Rc<RefCell<csv::Database>> = Rc::new(RefCell::new(csv::new_database())); // initial reference database. csv::new_database();
     reference_database = Rc::new(RefCell::new(csv::load_from_csv("src/test.csv")));
 
@@ -48,7 +129,7 @@ fn main() -> Result<(), slint::PlatformError> {
         *db = Rc::new(RefCell::new(reference_database.borrow().clone().show_column(&db.clone(), input)));
         update_table_display_from_database(&ui, &db);
     });
-
+*/
 
 
 
@@ -66,8 +147,7 @@ fn main() -> Result<(), slint::PlatformError> {
 
 
 
-fn update_table_display_from_database(ui: &AppWindow, database: &Rc<RefCell<csv::Database>>) {
-    let database: Database = database.borrow().clone();
+fn update_table_display_from_database(ui: &AppWindow, database: &Database) {
     let mut header_list: Vec<String> = header_list_from_database(database.clone());
     let mut body_list: Vec<Vec<String>> = body_list_from_database(database.clone());
 

@@ -69,8 +69,7 @@ impl Database {
             self.partners[i].values.push("N/A".to_string());
         }
     }
-    pub fn show_column(mut self, database: &Rc<RefCell<Database>>, header: slint::SharedString) -> Database {
-        let database = database.borrow();
+    pub fn show_column(mut self, database: &Database, header: slint::SharedString) -> Database {
         let header = header.to_string();
         let mut temp_database: Database = Database {
             partners: database.partners.clone(),
@@ -97,8 +96,7 @@ impl Database {
         }
         return temp_database;
     }
-    pub fn delete_column(mut self, database: &Rc<RefCell<Database>>, header: slint::SharedString) -> Database {
-        let database = database.borrow();
+    pub fn delete_column(mut self, database: &Database, header: slint::SharedString) -> Database {
         let header = header.to_string();
         let mut temp_database: Database = Database {
             partners: database.partners.clone(),
