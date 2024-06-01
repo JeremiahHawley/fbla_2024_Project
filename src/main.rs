@@ -21,6 +21,8 @@ fn main() -> Result<(), slint::PlatformError> {
     let ui = AppWindow::new()?;
 
 
+    // The main problem appears to be that the Database struct does not implement Copy, which it can't due to having a string field
+
     // MUST USE RC AND REFCELL
 
     let mut reference_database: Rc<RefCell<Database>> = Rc::new(RefCell::new(csv::load_from_csv("src/test.csv")));
@@ -35,101 +37,39 @@ fn main() -> Result<(), slint::PlatformError> {
 
     // DEFINE CALLBACKS
 
+    // Initial table display
+    update_table_display_from_database(&ui, &working_database.borrow());
+
+    // Define callbacks
+
+    // OK I don't entriely know how this works but it works
     let ui_handle = ui.as_weak();
-    ui.on_hide_column(|input: SharedString| {
+    let ref_db = Rc::clone(&reference_database);
+    let work_db = Rc::clone(&working_database);
+    ui.on_hide_column(move |input: SharedString| {
         if let Some(ui) = ui_handle.upgrade() {
-            let mut temp_database = working_database.borrow_mut();
-            *temp_database = reference_database.borrow().delete_column(&temp_database.clone(), input);
-            update_table_display_from_database(&ui, &working_database.borrow());
+            let mut temp_database = work_db.borrow_mut();
+            *temp_database = ref_db.borrow().clone().delete_column(&temp_database, input);
+            update_table_display_from_database(&ui, &temp_database);
         }
     });
 
     let ui_handle = ui.as_weak();
-    ui.on_show_column(|input: SharedString| {
+    let ref_db = Rc::clone(&reference_database);
+    let work_db = Rc::clone(&working_database);
+    ui.on_show_column(move |input: SharedString| {
         if let Some(ui) = ui_handle.upgrade() {
-            let mut temp_database = working_database.borrow_mut();
-            *temp_database = reference_database.borrow().show_column(&temp_database.clone(), input);
-            update_table_display_from_database(&ui, &working_database.borrow());
+            let mut temp_database = work_db.borrow_mut();
+            *temp_database = ref_db.borrow().clone().show_column(&temp_database, input);
+            update_table_display_from_database(&ui, &temp_database);
         }
-    });
+    }); 
 
 
 
 
 
 
-
-/* 
-    let mut reference_database: csv::Database = csv::new_database(); // initial reference database. csv::new_database();
-    reference_database = csv::load_from_csv("src/test.csv");
-
-    update_table_display_from_database(&ui, &reference_database); // initial table display
-    
-    // Rc is used for multiple ownership so that it can be passed to the callbacks
-    // RefCell is used so these other owners can mutate the database
-    let mut working_database = reference_database.clone(); // initial working database
-
-    // DEFINE CALLBACKS
-    let ui_handle = ui.as_weak();
-    //let working_database_clone: Rc<RefCell<csv::Database>> = Rc::clone(&working_database);
-    ui.on_hide_column( |input: slint::SharedString| {
-        let ui = ui_handle.upgrade().unwrap();
-        let temp_database = &mut working_database;
-        *temp_database = reference_database.clone().delete_column(&temp_database.clone(), input);
-        update_table_display_from_database(&ui, &working_database.clone());
-    });
-    
-
-
-    let ui_handle = ui.as_weak();
-    //let working_database_clone = Rc::clone(&working_database);
-    ui.on_show_column( |input: slint::SharedString| {
-        let ui = ui_handle.upgrade().unwrap();
-        let temp_database = &mut working_database;
-        *temp_database = reference_database.clone().show_column(&temp_database.clone(), input);
-        update_table_display_from_database(&ui, &working_database.clone());
-    });
-*/
-
-
-
-
-
-
-
-
-
-
-
-    /* 
-    let mut reference_database: Rc<RefCell<csv::Database>> = Rc::new(RefCell::new(csv::new_database())); // initial reference database. csv::new_database();
-    reference_database = Rc::new(RefCell::new(csv::load_from_csv("src/test.csv")));
-
-    update_table_display_from_database(&ui, &reference_database); // initial table display
-    
-    // Rc is used for multiple ownership so that it can be passed to the callbacks
-    // RefCell is used so these other owners can mutate the database
-    let working_database = reference_database.clone(); // initial working database
-
-    // DEFINE CALLBACKS
-    let ui_handle = ui.as_weak();
-    //let working_database_clone: Rc<RefCell<csv::Database>> = Rc::clone(&working_database);
-    ui.on_hide_column(move |input: slint::SharedString| {
-        let ui = ui_handle.upgrade().unwrap();
-        let mut db = working_database.borrow_mut();
-        *db = Rc::new(RefCell::new(reference_database.borrow().clone().delete_column(&db.clone(), input)));
-        update_table_display_from_database(&ui, &db);
-    });
-    
-    let ui_handle = ui.as_weak();
-    //let working_database_clone = Rc::clone(&working_database);
-    ui.on_show_column(move |input: slint::SharedString| {
-        let ui = ui_handle.upgrade().unwrap();
-        let mut db = working_database.borrow_mut();
-        *db = Rc::new(RefCell::new(reference_database.borrow().clone().show_column(&db.clone(), input)));
-        update_table_display_from_database(&ui, &db);
-    });
-*/
 
 
 
