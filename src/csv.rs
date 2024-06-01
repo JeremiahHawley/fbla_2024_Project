@@ -32,6 +32,7 @@ fn sort_csv_by_column(column: &str, order: &str) -> Vec<Vec<&str>> {
 */
 
 use std::fs::File;
+use std::ptr::null;
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::io::{self, Read, BufReader, Write};
@@ -112,6 +113,10 @@ impl Database {
         }
         temp_database.headers.remove(if (index > 0) { index - 1 } else { 0 });
         for i in 0..temp_database.partners.len() { 
+            if index == 0{
+                temp_database.partners[i].name = "N/A".to_string(); // DEBUG: fix this so don't need the N/A and instead actually remove the value (make all one field?)
+                continue;
+            }
             temp_database.partners[i].values.remove(if (index > 0) { index - 2 } else { 0 });
         }
         return temp_database;

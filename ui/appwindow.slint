@@ -111,7 +111,7 @@ export component AppWindow inherits Window {
                     width: 50px;
                     height: 50px;
                     text: "Value";
-                    toggled => { if (self.checked) {hide_column(self.text)} else {/*unhide*/}}
+                    toggled => { if (self.checked) {hide_column(self.text)} else {show_column(self.text)}}
                 }
                 is_type_hidden := CheckBox {
                     x: parent.width*(1/4);
@@ -119,7 +119,7 @@ export component AppWindow inherits Window {
                     width: 50px;
                     height: 50px;
                     text: "Type";
-                    toggled => { if (self.checked) {hide_column(self.text)} else {/*unhide*/}}
+                    toggled => { if (self.checked) {hide_column(self.text)} else {show_column(self.text)}}
                 }
                 is_phone_number_hidden := CheckBox {
                     x: parent.width*(3/5);
@@ -127,7 +127,7 @@ export component AppWindow inherits Window {
                     width: 50px;
                     height: 50px;
                     text: "Phone Number";
-                    toggled => { if (self.checked) {hide_column(self.text)} else {/*unhide*/}}
+                    toggled => { if (self.checked) {hide_column(self.text)} else {show_column(self.text)}}
                 }
                 is_address_hidden := CheckBox {
                     x: parent.width*(3/5);
@@ -135,7 +135,7 @@ export component AppWindow inherits Window {
                     width: 50px;
                     height: 50px;
                     text: "Address";
-                    toggled => { if (self.checked) {hide_column(self.text)} else {/*unhide*/}}
+                    toggled => { if (self.checked) {hide_column(self.text)} else {show_column(self.text)}}
                 }
                 is_scholarship_hidden := CheckBox {
                     x: parent.width*(3/5);
@@ -143,7 +143,7 @@ export component AppWindow inherits Window {
                     width: 50px;
                     height: 50px;
                     text: "Scholarship";
-                    toggled => { if (self.checked) {hide_column(self.text)} else {/*unhide*/}}
+                    toggled => { if (self.checked) {hide_column(self.text)} else {show_column(self.text)}}
                 }
             }
         }

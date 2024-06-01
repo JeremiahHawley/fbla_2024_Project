@@ -16,31 +16,17 @@ use std::rc::Rc;
 use std::cell::RefCell;
 
 
-
 fn main() -> Result<(), slint::PlatformError> {
     let ui = AppWindow::new()?;
 
-
-    // The main problem appears to be that the Database struct does not implement Copy, which it can't due to having a string field
-
-    // MUST USE RC AND REFCELL
-
-    let mut reference_database: Rc<RefCell<Database>> = Rc::new(RefCell::new(csv::load_from_csv("src/test.csv")));
-
-    update_table_display_from_database(&ui, &reference_database.borrow()); // initial table display
-
     // Rc is used for multiple ownership so that it can be passed to the callbacks
     // RefCell is used so these other owners can mutate the database
-
+    let mut reference_database: Rc<RefCell<Database>> = Rc::new(RefCell::new(csv::load_from_csv("src/test.csv")));
     let working_database: Rc<RefCell<Database>> = Rc::new(RefCell::new(reference_database.borrow().clone())); // initial working database
+    update_table_display_from_database(&ui, &reference_database.borrow()); // initial table display
 
 
     // DEFINE CALLBACKS
-
-    // Initial table display
-    update_table_display_from_database(&ui, &working_database.borrow());
-
-    // Define callbacks
 
     // OK I don't entriely know how this works but it works
     let ui_handle = ui.as_weak();
@@ -70,12 +56,6 @@ fn main() -> Result<(), slint::PlatformError> {
 
 
 
-
-
-
-    
-
-
     //let ui_handle = ui.as_weak(); // currently unused but will be used for interactive ui
     /* ui. on_request_increase_value (move || {
         let ui = ui_handle.unwrap();
@@ -84,6 +64,10 @@ fn main() -> Result<(), slint::PlatformError> {
 
     ui.run()
 }
+
+
+
+
 
 
 
