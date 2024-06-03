@@ -10,6 +10,7 @@ fn main() {
 */
 
 slint::include_modules!();
+
 use csv::Database;
 use slint::{ ModelRc, StandardListViewItem, TableColumn, VecModel, SharedString};
 use std::rc::Rc;
@@ -22,13 +23,13 @@ fn main() -> Result<(), slint::PlatformError> {
     // Rc is used for multiple ownership so that it can be passed to the callbacks
     // RefCell is used so these other owners can mutate the database
     let mut reference_database: Rc<RefCell<Database>> = Rc::new(RefCell::new(csv::load_from_csv("src/test.csv")));
-    let working_database: Rc<RefCell<Database>> = Rc::new(RefCell::new(reference_database.borrow().clone())); // initial working database
+    let mut working_database: Rc<RefCell<Database>> = Rc::new(RefCell::new(reference_database.borrow().clone())); // initial working database
     update_table_display_from_database(&ui, &reference_database.borrow()); // initial table display
 
 
     // DEFINE CALLBACKS
 
-    // OK I don't entriely know how this works but it works
+ 
     let ui_handle = ui.as_weak();
     let ref_db = Rc::clone(&reference_database);
     let work_db = Rc::clone(&working_database);

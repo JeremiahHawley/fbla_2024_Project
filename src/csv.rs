@@ -31,6 +31,7 @@ fn sort_csv_by_column(column: &str, order: &str) -> Vec<Vec<&str>> {
         }
 */
 
+
 use std::fs::File;
 use std::ptr::null;
 use std::rc::Rc;
@@ -52,9 +53,6 @@ impl Partner{
             return self.values[n].clone();
         }
         return "".to_string();
-    }
-    pub fn clone(&self) -> Partner{
-        return Partner{name: self.name.clone(), values: self.values.clone()};
     }
 }
 
@@ -87,11 +85,11 @@ impl Database {
         temp_database.headers.insert(index, header.to_string());
         // if name, add name, then do others
         if header == "Name" {
-            for i in 0..(temp_database.partners.len() - 1) {
+            for i in 0..(temp_database.partners.len()) {
                 temp_database.partners[i].name = self.partners[i].name.clone();
             }
         } else {
-            for i in 0..(temp_database.partners.len() - 1) {
+            for i in 0..(temp_database.partners.len()) {
                 temp_database.partners[i].values.insert(index-1, self.partners[i].values[index-1].clone());
             }
         }
@@ -104,21 +102,25 @@ impl Database {
             headers: database.headers.clone(),
         };
         let mut index: usize = 0; 
+        let is_header_found: bool = false;
         for data_type in &temp_database.headers{
-            if data_type.to_ascii_lowercase() == header.to_ascii_lowercase(){ // BUG: this is never true for the case
-                print!("found matching header: {}", data_type); // DEBUG
+            if data_type.to_ascii_lowercase() == header.to_ascii_lowercase(){ // BUG: this is never true for if the column is not found
+                is_header_found = true;
                 break;
             }
             index += 1;
         }
-        temp_database.headers.remove(if (index > 0) { index - 1 } else { 0 });
+        if !is_header_found{ // return the same database if the column is not found
+            return temp_database;
+        }
+        // modify temp_database
+        temp_database.headers.remove(index); 
         for i in 0..temp_database.partners.len() { 
             if index == 0{
-                temp_database.partners[i].name = "N/A".to_string(); // DEBUG: fix this so don't need the N/A and instead actually remove the value (make all one field?)
+                temp_database.partners[i].name = "N/A".to_string(); 
                 continue;
             }
-            temp_database.partners[i].values.remove(if (index > 0) { index - 2 } else { 0 });
-        }
+            temp_database.partners[i].values.remove(if index > 0 { index - 1 } else { 0 }); 
         return temp_database;
     }
 

@@ -1,5 +1,5 @@
 
-import { ComboBox, CheckBox, Button, StandardTableView, HorizontalBox, LineEdit } from "std-widgets.slint";
+import { ComboBox, CheckBox, Button, StandardTableView, HorizontalBox, LineEdit, ScrollView } from "std-widgets.slint";
 export component AppWindow inherits Window {
     // `in` means that it is data that is taken into the widget but cannot be modified by the widget
     
@@ -252,23 +252,30 @@ export component AppWindow inherits Window {
 
             
 
-            table_display := Rectangle { 
+            table_display := Rectangle { // add a scrollview to contain the tableview
                 background: green;
-
-                csv_display := StandardTableView {
+                /*
+                ScrollView {
                     x: parent.x;
                     y: parent.y;
                     width: parent.width;
-                    height: parent.height;
-                    columns: header-data;
-                    rows: table-data;
-                    sort-ascending => {
-                        // sort ascending by column
+                    height: parent.height; */
+                    
+                    csv_display := StandardTableView {
+                        x: parent.x;
+                        y: parent.y;
+                        width: parent.width;
+                        height: parent.height;
+                        columns: header-data;
+                        rows: table-data;
+                        sort-ascending => {
+                            // sort ascending by column
+                        }
+                        sort-descending => {
+                            // sort decending by column
+                        }
                     }
-                    sort-descending => {
-                        // sort decending by column
-                    }
-                }
+                //}
             }
         }
     }
