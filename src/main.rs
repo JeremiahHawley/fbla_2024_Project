@@ -37,6 +37,7 @@ fn main() -> Result<(), slint::PlatformError> {
         if let Some(ui) = ui_handle.upgrade() {
             let mut temp_database = work_db.borrow_mut();
             *temp_database = ref_db.borrow().clone().delete_column(&temp_database, input);
+            // TODO: if returned table is the same as the input table, then don't change the button status (is this possible?) so that the action terminates and has no side effects
             update_table_display_from_database(&ui, &temp_database);
         }
     });
@@ -48,6 +49,7 @@ fn main() -> Result<(), slint::PlatformError> {
         if let Some(ui) = ui_handle.upgrade() {
             let mut temp_database = work_db.borrow_mut();
             *temp_database = ref_db.borrow().clone().show_column(&temp_database, input);
+            // TODO: if returned table is the same as the input table, then don't change the button status (is this possible?) so that the action terminates and has no side effects
             update_table_display_from_database(&ui, &temp_database);
         }
     }); 

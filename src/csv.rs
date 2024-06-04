@@ -102,7 +102,7 @@ impl Database {
             headers: database.headers.clone(),
         };
         let mut index: usize = 0; 
-        let is_header_found: bool = false;
+        let mut is_header_found: bool = false;
         for data_type in &temp_database.headers{
             if data_type.to_ascii_lowercase() == header.to_ascii_lowercase(){ // BUG: this is never true for if the column is not found
                 is_header_found = true;
@@ -110,7 +110,9 @@ impl Database {
             }
             index += 1;
         }
-        if !is_header_found{ // return the same database if the column is not found
+        if !is_header_found || temp_database.partners[0].values.len() == 1{ 
+            // return the same database if the column is not found
+            // return the same database if removing said column would result in an empty values vector for partners (partner 0 used as reference)
             return temp_database;
         }
         // modify temp_database
@@ -121,7 +123,8 @@ impl Database {
                 continue;
             }
             temp_database.partners[i].values.remove(if index > 0 { index - 1 } else { 0 }); 
-        return temp_database;
+        }
+        return temp_database;  
     }
 
     pub fn add_row(mut self, name: &String){
