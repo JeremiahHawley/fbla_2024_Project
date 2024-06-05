@@ -40,7 +40,7 @@ use std::io::{self, Read, BufReader, Write};
 
 const FILE_PATH: &str = "src/test.csv";
 
-#[derive(Clone)] // allows Partner to be cloned
+#[derive(Clone, PartialEq)] // allows Partner to be cloned and use == and !=
 pub struct Partner {
     name: String,
     values: Vec<String>,
@@ -56,7 +56,7 @@ impl Partner{
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct Database {
     partners: Vec<Partner>,
     headers: Vec<String>,
@@ -69,14 +69,20 @@ impl Database {
         }
     }
     pub fn show_column(mut self, database: &Database, header: slint::SharedString) -> Database {
+        if database.headers.iter().any(|x| x.to_ascii_lowercase() == header.to_ascii_lowercase()) 
+            || !self.headers.iter().any(|x| x.to_ascii_lowercase() == header.to_ascii_lowercase())
+        {
+            return database.clone(); // returns the existing database if that column already exists or if the column doesn't exist in the reference database
+        }
+
         let header = header.to_string();
         let mut temp_database: Database = Database {
             partners: database.partners.clone(),
             headers: database.headers.clone(),
         };
         let mut index: usize = 0;
-        for data_type in self.headers {
-            if data_type.to_ascii_lowercase() == header.to_ascii_lowercase() {
+        for i in 0..self.headers.len()-1 {
+            if self.headers[i].to_ascii_lowercase() == header.to_ascii_lowercase() {
                 break;
             }
             index += 1;
