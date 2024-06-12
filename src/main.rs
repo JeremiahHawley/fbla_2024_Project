@@ -52,6 +52,31 @@ fn main() -> Result<(), slint::PlatformError> {
         }
     }); 
 
+    // Sort ascending
+    let ui_handle = ui.as_weak();
+    let ref_db = Rc::clone(&reference_database);
+    let work_db = Rc::clone(&working_database);
+    ui.on_sort_ascending(move |input: i32| { // TODO: may need to convert between slint int and rust i32
+        if let Some(ui) = ui_handle.upgrade() {
+            let mut temp_database = work_db.borrow_mut();
+            // TODO: check correct function
+            *temp_database = ref_db.borrow().clone().sort_ascending_by_column(&temp_database, input); // TODO: add the correct column and check whether input is i32
+            update_table_display_from_database(&ui, &temp_database);
+        }
+    }); 
+
+    // Sort decending
+    let ui_handle = ui.as_weak();
+    let ref_db = Rc::clone(&reference_database);
+    let work_db = Rc::clone(&working_database);
+    ui.on_sort_decending(move |input: i32| {// TODO: may need to convert between slint int and rust i32
+        if let Some(ui) = ui_handle.upgrade() {
+            let mut temp_database = work_db.borrow_mut();
+            // TODO: check correct function
+            *temp_database = ref_db.borrow().clone().sort_decending_by_column(&temp_database, input); // TODO: add the correct column and check whether input is i32
+            update_table_display_from_database(&ui, &temp_database);
+        }
+    }); 
     /* 
     let ui_handle = ui.as_weak();
     let ref_db = Rc::clone(&reference_database);

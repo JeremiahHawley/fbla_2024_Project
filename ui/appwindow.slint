@@ -10,6 +10,8 @@ export component AppWindow inherits Window {
     callback show_column(string);
     callback hide_name();
     callback show_name();
+    callback sort-ascending(int);
+    callback sort-descending(int);
     
 
     width: 1200px;
@@ -272,9 +274,11 @@ export component AppWindow inherits Window {
                         rows: table-data;
                         sort-ascending => {
                             // sort ascending by column
+                            sort-ascending(self.current-sort-column);
                         }
                         sort-descending => {
                             // sort decending by column
+                            sort-descending(self.current-sort-column);
                         }
                     }
                 //}
