@@ -52,6 +52,7 @@ fn main() -> Result<(), slint::PlatformError> {
         }
     }); 
 
+    /* 
     // Sort ascending
     let ui_handle = ui.as_weak();
     let ref_db = Rc::clone(&reference_database);
@@ -77,6 +78,12 @@ fn main() -> Result<(), slint::PlatformError> {
             update_table_display_from_database(&ui, &temp_database);
         }
     }); 
+*/
+
+
+
+
+
     /* 
     let ui_handle = ui.as_weak();
     let ref_db = Rc::clone(&reference_database);

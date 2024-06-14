@@ -12,10 +12,66 @@ export component AppWindow inherits Window {
     callback show_name();
     callback sort-ascending(int);
     callback sort-descending(int);
+    callback open_popup();
+    callback close_popup();
     
 
     width: 1200px;
     height: 1000px;
+
+    popup := PopupWindow {
+        close-on-click: false;
+        x: parent.width/6;
+        y: parent.height/6;
+        width: parent.width*(2/3);
+        height: parent.height*(2/3);
+
+        popup_background := Rectangle {
+            background: white;
+            x: parent.x;
+            y: parent.y;
+            width: parent.width;
+            height: parent.height;
+            VerticalLayout {
+                x: parent.x;
+                y: parent.y;
+                width: parent.width;
+                height: parent.height;
+
+                header_text := Text {
+                    width: self.preferred-width;
+                    height: self.preferred-height;
+                    horizontal-alignment: center;
+                    vertical-alignment: center;
+                    font-size: 24px;
+                    wrap: word-wrap;
+                    //font-weight: 4; // 100-900 (400 default)
+                    text: "Test Header";
+                }
+                help_text := Text {
+                    width: parent.width;
+                    height: self.preferred-height;
+                    horizontal-alignment: left;
+                    vertical-alignment: center;
+                    font-size: 14px;
+                    //font-weight: 2; // 100-900 (400 default)
+                    wrap: word-wrap;
+                    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+                    
+                }
+                
+                exit_button := Button {
+                    x: parent.width/2;
+                    width: self.preferred-width;
+                    height: self.preferred-height;
+                    text: "close";
+                    clicked => { popup.close(); }
+                }
+                
+                
+            }
+        }
+    }
 
     main_layout := HorizontalLayout { // creates an unnamed `HorizonalLayout`
         left_side := VerticalLayout {
@@ -38,9 +94,9 @@ export component AppWindow inherits Window {
                     TouchArea {
                         clicked => { 
                             if (self.pressed){
-                                /* open menu */
+                                popup.show();
                             } else {
-                                /* close menu */
+                                popup.close();
                             }
                         }
                     }
