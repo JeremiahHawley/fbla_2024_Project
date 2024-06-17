@@ -61,7 +61,7 @@ export component AppWindow inherits Window {
                 }
                 
                 exit_button := Button {
-                    x: parent.width/2;
+                    x: parent.width/2 - self.preferred-width/2; // centered
                     width: self.preferred-width;
                     height: self.preferred-height;
                     text: "close";
