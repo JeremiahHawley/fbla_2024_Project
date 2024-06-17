@@ -224,6 +224,41 @@ impl Database {
     pub fn sort_by_column(){
         // TODO: implement FUNCTION ===================================================================
     }
+
+    pub fn search_column(database: &Database, target: Vec<String>) -> Database {
+        // TODO: implement creation of target vector in main.rs to pass into this from the callback definition
+        // takes in a vector composed of all of the inputs (may be empty strings)
+        // returns a new database with all rows that satisfy the criteria in the given columns
+        // the target vector should be in the same order as the headers vector
+        // returns a WORKING DATABASE
+
+        let mut temp_database: Database = database.clone();
+        // implement logic
+
+        // parse each column 
+        // break target up into strings and search the respective column
+        /*
+        let mut target_index: usize = 0;
+        for target_index in 0..target.len(){ // parse each column
+            for data_value in &temp_database.partners{ // search the respective column
+                
+            }
+        }
+        
+        
+        
+        
+        */
+
+
+        //do a (boolean union) join of sorts
+
+
+        return temp_database;
+
+
+
+    }
 }
 
 pub fn load_from_csv(filepath: &str) -> Database {

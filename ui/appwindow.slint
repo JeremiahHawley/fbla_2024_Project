@@ -113,42 +113,6 @@ export component AppWindow inherits Window {
                     y: parent.height*(1/16);
                     text: "Sort Options";
                 }
-                Text {
-                    x: parent.width*(1/4);
-                    y: parent.height*(3/32);
-                    text: "sort order";
-                }
-                Text {
-                    x: parent.width*(3/5);
-                    y: parent.height*(3/32);
-                    text: "column sorted";
-                }
-                sort_order := ComboBox {
-                    x: parent.width*(1/4);
-                    y: parent.height*(2/16);
-                    width: self.preferred-width;
-                    height: self.preferred-height;
-                    model: ["first", "second", "third"]; // TODO: rename/create sort orders
-                    current-value: "first";
-                    selected => {/*change sort order based on this and sort_column*/}
-                }
-                sort_column := ComboBox {
-                    x: parent.width*(3/5);
-                    y: parent.height*(2/16);
-                    width: self.preferred-width;
-                    height: self.preferred-height;
-                    model: ["first", "second", "third"]; // TODO: rename/create sort orders
-                    current-value: "first";
-                    selected => {/* change sort order based on this and sort_order */}
-                }
-                
-                has_scholarship_filter := CheckBox {
-                    x: parent.width*(2/5);
-                    y: parent.height*(3/16);
-                    width: self.preferred-width;
-                    height: self.preferred-height;
-                    text: "hasScholarship";
-                }
                 
 
                 Text {
