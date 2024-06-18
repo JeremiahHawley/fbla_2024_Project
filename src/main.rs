@@ -52,6 +52,28 @@ fn main() -> Result<(), slint::PlatformError> {
         }
     }); 
 
+
+    let ui_handle = ui.as_weak();
+    let ref_db = Rc::clone(&reference_database);
+    let work_db = Rc::clone(&working_database);
+    ui.on_update_search(move |target: SharedString| {
+        if let Some(ui) = ui_handle.upgrade() {
+            let mut temp_database = work_db.borrow_mut();
+            *temp_database = ref_db.borrow().clone().search_column(&temp_database, &target.to_string());
+            update_table_display_from_database(&ui, &temp_database);
+        }
+    }); 
+
+
+
+
+
+
+
+
+
+
+
     /* 
     // Sort ascending
     let ui_handle = ui.as_weak();

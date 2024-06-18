@@ -14,6 +14,7 @@ export component AppWindow inherits Window {
     callback sort-descending(int);
     callback open_popup();
     callback close_popup();
+    callback update_search(string);
     
 
     width: 1200px;
@@ -205,27 +206,21 @@ export component AppWindow inherits Window {
                         height: parent.height;
                         font-size: 14px;
                         placeholder-text: "Name";
-                        accepted => {
-                            self.select-all() /* export to name part of search function */
-                        }
+                        edited => { update_search(self.text); }
                     }
                     inbox-value := LineEdit {
                         y: parent.y;
                         height: parent.height;
                         font-size: 14px;
                         placeholder-text: "Value";
-                        accepted => {
-                            self.select-all() /* export to value part of search function */
-                        }
+                        edited => { update_search(self.text); }
                     }
                     inbox-type := LineEdit {
                         y: parent.y;
                         height: parent.height;
                         font-size: 14px;
                         placeholder-text: "Type";
-                        accepted => {
-                            self.select-all() /* export to type part of search function */
-                        }
+                        edited => { update_search(self.text); }
                     }
                 }
                 HorizontalBox {
@@ -238,27 +233,21 @@ export component AppWindow inherits Window {
                         height: parent.height;
                         font-size: 14px;
                         placeholder-text: "Phone Number";
-                        accepted => {
-                            self.select-all() /* export to phone-number part of search function */
-                        }
+                        edited => { update_search(self.text); }
                     }
                     inbox-address := LineEdit {
                         y: parent.y;
                         height: parent.height;
                         font-size: 14px;
                         placeholder-text: "Address";
-                        accepted => {
-                            self.select-all() /* export to address part of search function */
-                        }
+                        edited => { update_search(self.text); }
                     }
                     inbox-scholarship := LineEdit {
                         y: parent.y;
                         height: parent.height;
                         font-size: 14px;
-                        placeholder-text: "Scholarship";// add a y/n or true/false depending on csv since it is a boolean
-                        accepted => {
-                            self.select-all() /* export to scholarship part of search function */
-                        }
+                        placeholder-text: "Scholarship";
+                        edited => { update_search(self.text); }
                     }
                 }
                 

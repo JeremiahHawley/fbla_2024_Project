@@ -213,41 +213,68 @@ impl Database {
         // TODO: implement FUNCTION ===================================================================
     }
 
-    pub fn search_column(database: &Database, target: Vec<String>) -> Database {
+    //
+    //
+    // TODO
+    // IMPORTANT NOTE: must do all columns at once due to how reference and working databases work (each call is a completely new filter from scratch)
+    //
+    //
+    pub fn search_column(self, database: &Database, target: &String) -> Database {
         // TODO: implement creation of target vector in main.rs to pass into this from the callback definition
-        // takes in a vector composed of all of the inputs (may be empty strings)
-        // returns a new database with all rows that satisfy the criteria in the given columns
-        // the target vector should be in the same order as the headers vector
+        
         // returns a WORKING DATABASE
-
-        let mut temp_database: Database = database.clone();
-        // implement logic
-
-        // parse each column 
-        // break target up into strings and search the respective column
-        /*
+        if target.len() == 0{
+            return database.clone();
+        }
+    
+        let mut temp_database: Database = new_database();
+        
         let mut target_index: usize = 0;
-        for target_index in 0..target.len(){ // parse each column
-            for data_value in &temp_database.partners{ // search the respective column
-
+        // find target_index in headers of database
+        for i in 0..database.headers.len(){
+            if database.headers[i] == *target{
+                target_index = i;
+                break;
             }
         }
-        
-        
-        
-        
-        */
-
-
-        //do a (boolean union) join of sorts
-
-
+    
+        'search_within_column: for data_value in &database.partners{ // search the respective column
+            // if that row is already in the database, skip
+            // search by name (values[0])
+            for partner in &temp_database.partners{
+                if partner.values.len() == 0 || data_value.values.len() == 0{
+                    continue 'search_within_column;
+                }
+                if partner.values[0] == data_value.values[0] {
+                    continue 'search_within_column;
+                }
+            }
+            //data_value.values[target_index] // string to search
+            // target[target_index] // string to search for
+            //test equality for all substrings of target of the same length as target
+            let data_value_clone = data_value.clone();
+            for i in 0..(data_value_clone.values[target_index].len()-target.len()+1){
+                if target.len() > data_value_clone.values[target_index].len(){
+                    // if target is longer than data_value, skip
+                    continue 'search_within_column;
+                }
+                if data_value_clone.values[target_index][i..i+target.len()] == *target{
+                    // push this row to temp_database
+                    temp_database.partners.push(data_value_clone.clone());
+                }
+            }
+        }
+    
         return temp_database;
-
-
-
     }
+    
+
+    
 }
+
+
+
+
 
 pub fn load_from_csv(filepath: &str) -> Database {
     let mut new_database: Database = Database{
