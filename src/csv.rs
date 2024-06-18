@@ -42,11 +42,9 @@ const FILE_PATH: &str = "src/test.csv";
 
 #[derive(Clone, PartialEq)] // allows Partner to be cloned and use == and !=
 pub struct Partner {
-    name: String,
     values: Vec<String>,
 }
 impl Partner{
-    pub fn return_name(&self) -> String{self.name.clone()}
     pub fn return_values(&self) -> Vec<String>{self.values.clone()}
     pub fn return_index_values(&self,n: usize) -> String{
         if n < self.values.len(){
@@ -89,16 +87,12 @@ impl Database {
         }
 
         temp_database.headers.insert(index, header.to_string());
-        // if name, add name, then do others
-        if header == "Name" {
-            for i in 0..(temp_database.partners.len()) {
-                temp_database.partners[i].name = self.partners[i].name.clone();
-            }
-        } else {
-            for i in 0..(temp_database.partners.len()) {
-                temp_database.partners[i].values.insert(index-1, self.partners[i].values[index-1].clone());
-            }
+      
+
+        for i in 0..(temp_database.partners.len()) {
+            temp_database.partners[i].values.insert(index, self.partners[i].values[index].clone());
         }
+        
         return temp_database;
     }
     pub fn delete_column(mut self, database: &Database, header: slint::SharedString) -> Database {
@@ -124,26 +118,20 @@ impl Database {
         // modify temp_database
         temp_database.headers.remove(index); 
         for i in 0..temp_database.partners.len() { 
-            if index == 0{
-                temp_database.partners[i].name = "N/A".to_string(); 
-                continue;
-            }
-            temp_database.partners[i].values.remove(if index > 0 { index - 1 } else { 0 }); 
+            temp_database.partners[i].values.remove(index); 
         }
         return temp_database;  
     }
 
-    pub fn add_row(mut self, name: &String){
+    pub fn add_row(mut self){
         self.partners.push(
             Partner { 
-                name: name.clone(), 
                 values: Vec::new() }
         );
     }
-    pub fn add_row_from_vec(mut self, name: &String, values: &Vec<String>){
+    pub fn add_row_from_vec(mut self, values: &Vec<String>){
         self.partners.push(
             Partner { 
-                name: name.clone(), 
                 values: values.clone() 
             }
         )
@@ -151,7 +139,7 @@ impl Database {
     pub fn delete_row(mut self,name: &String){
         let mut index: usize = 0;
         for partner in &self.partners{
-            if &partner.name == name{
+            if &partner.values[0] == name{
                 break;
             }
             index += 1;
@@ -161,7 +149,7 @@ impl Database {
     pub fn edit_row(mut self, name: &String, values: &Vec<String>){
         let mut index: usize = 0;
         for partner in &self.partners{
-            if &partner.name == name{
+            if &partner.values[0] == name{
                 break;
             }
             index += 1;
@@ -178,12 +166,12 @@ impl Database {
             header_index += 1;
         }
         for partner in &self.partners{
-            if &partner.name == name{
+            if &partner.values[0] == name{
                 break;
             }
             name_index += 1;
         }
-        self.partners[name_index].values[header_index] = value.clone() ;
+        self.partners[name_index].values[header_index] = value.clone();
     }
     pub fn save_to_csv(self) -> io::Result<()> {
         let mut string_to_write = String::new();
@@ -199,12 +187,12 @@ impl Database {
     
     // Returns a new database with the specified row hidden
     pub fn hide_row(self, name: &String) -> Database{
-        let mut temp_database:Database = Database{
+        let mut temp_database: Database = Database{
             partners: Vec::new(),
             headers: self.headers,
         };
         for partner in self.partners{
-            if &partner.name != name{
+            if &partner.values[0] != name{
                 temp_database.partners.push(partner);
             }
         }
@@ -241,7 +229,7 @@ impl Database {
         let mut target_index: usize = 0;
         for target_index in 0..target.len(){ // parse each column
             for data_value in &temp_database.partners{ // search the respective column
-                
+
             }
         }
         
@@ -322,8 +310,7 @@ pub fn load_from_csv(filepath: &str) -> Database {
             continue;
         }
         let partner = Partner {
-            name: row[0].clone(),
-            values: row[1..row.len()].to_vec()
+            values: row.to_vec()
         };
         new_database.partners.push(partner);
 
@@ -332,7 +319,7 @@ pub fn load_from_csv(filepath: &str) -> Database {
 }
 // Creates a new EMPTY database
 pub fn new_database() -> Database{
-    return Database{partners: vec![Partner{name: "".to_string(), values: Vec::new()}], headers: Vec::new()};
+    return Database{partners: vec![Partner{values: Vec::new()}], headers: Vec::new()};
 }
 
 pub fn test_file_reading() -> io::Result<()> {
@@ -368,7 +355,6 @@ pub fn db_to_2d_vec(db: Database) -> Vec<Vec<String>> {
     return_vector.push(header_row);
     for partner in db.partners{
         let mut temp_vector: Vec<String> = Vec::new(); 
-        temp_vector.push(partner.name.clone());
         for value in partner.values{
             temp_vector.push(value);
         }
