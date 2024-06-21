@@ -213,22 +213,52 @@ impl Database {
         // TODO: implement FUNCTION ===================================================================
     }
 
-    //
+    
+    
+
+    
+}
+
+//
     //
     // TODO
     // IMPORTANT NOTE: must do all columns at once due to how reference and working databases work (each call is a completely new filter from scratch)
+    // uses working database as a reference database in a sense to maintain what columns are hidden
     //
-    //
-    pub fn search_column(self, database: &Database, target: &String) -> Database {
+    // NOTE:not sure it needs a reference database (self)
+    pub fn search_column(database: &Database, target_vec: Vec<String>) -> Database {
         // TODO: implement creation of target vector in main.rs to pass into this from the callback definition
         
         // returns a WORKING DATABASE
-        if target.len() == 0{
+        // TODO: add functionality for if the target_vec is shorter than database.headers.len()
+        if target_vec.len() == 0 || database.partners.len() == 0 || target_vec.len() < database.headers.len(){
+            // BEGIN DEBUG ===========================================================================
+            if target_vec.len() == 0{
+                println!("DEBUG: search column called with empty target_vec");
+            }
+            if database.partners.len() == 0{
+                println!("DEBUG: search column called with empty database");
+            }
+            if target_vec.len() != database.headers.len(){
+                println!("DEBUG: target_vec length does not match database headers length");
+            }
+            println!("DEBUG: search column called with incorrect data");
+            // END DEBUG =============================================================================
             return database.clone();
         }
+
+
     
         let mut temp_database: Database = new_database();
-        
+
+        // if the target_vec is shorter than the database, use the shorter length
+        // uses variable shadowing instead of mutability
+        let target_vec = if target_vec.len() == database.headers.len() {
+            target_vec
+        } else {
+            target_vec[..database.headers.len()].to_vec()
+        };
+        /* 
         let mut target_index: usize = 0;
         // find target_index in headers of database
         for i in 0..database.headers.len(){
@@ -236,43 +266,40 @@ impl Database {
                 target_index = i;
                 break;
             }
-        }
-    
-        'search_within_column: for data_value in &database.partners{ // search the respective column
-            // if that row is already in the database, skip
-            // search by name (values[0])
-            for partner in &temp_database.partners{
-                if partner.values.len() == 0 || data_value.values.len() == 0{
-                    continue 'search_within_column;
+        }*/
+        'parse_each_column: for target_index in 0..database.headers.len(){
+            'search_within_column: for working_partner in &database.partners{ // search the respective column
+                // if that row is already in the database, skip
+                // search by name (values[0])
+                for new_partner in &temp_database.partners{
+                    if new_partner.values.len() == 0 || working_partner.values.len() == 0{
+                        continue 'search_within_column;
+                    }
+                    if new_partner.values[0] == working_partner.values[0] { // checks if any existing new_partner.name == working_partner.name for the given interation of working_partner
+                        continue 'search_within_column;
+                    }
                 }
-                if partner.values[0] == data_value.values[0] {
-                    continue 'search_within_column;
-                }
-            }
-            //data_value.values[target_index] // string to search
-            // target[target_index] // string to search for
-            //test equality for all substrings of target of the same length as target
-            let data_value_clone = data_value.clone();
-            for i in 0..(data_value_clone.values[target_index].len()-target.len()+1){
-                if target.len() > data_value_clone.values[target_index].len(){
-                    // if target is longer than data_value, skip
-                    continue 'search_within_column;
-                }
-                if data_value_clone.values[target_index][i..i+target.len()] == *target{
-                    // push this row to temp_database
-                    temp_database.partners.push(data_value_clone.clone());
+                //data_value.values[target_index] // string to search
+                // target[target_index] // string to search for
+                //test equality for all substrings of target of the same length as target
+                let working_partner_clone = working_partner.clone();
+                // iterates through the given value of working_partner with a smaller length string (target_vec[target_index]) and checks each substring of that length against the target string
+                for i in 0..(working_partner_clone.values[target_index].len()-target_vec[target_index].len()){ // NOTE: may need a '+1' here, not sure
+                    if target_vec[target_index].len() > working_partner_clone.values[target_index].len(){
+                        // if target is longer than data_value, skip
+                        continue 'search_within_column;
+                    }
+                    // checks if the respective substring of the working_partner_clone string is equal to the target_vec[target_index] string (* needed to dereference target_vec[target_index])
+                    if working_partner_clone.values[target_index][i..i+target_vec[target_index].len()] == *target_vec[target_index]{
+                        // push this row to temp_database
+                        temp_database.partners.push(working_partner_clone.clone());
+                    }
                 }
             }
         }
     
         return temp_database;
     }
-    
-
-    
-}
-
-
 
 
 

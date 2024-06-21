@@ -12,6 +12,7 @@ fn main() {
 slint::include_modules!();
 
 use csv::Database;
+use csv::search_column; // not sure why it needs to import this function and not others but it makes it work
 use slint::{ ModelRc, StandardListViewItem, TableColumn, VecModel, SharedString};
 use std::rc::Rc;
 use std::cell::RefCell;
@@ -54,13 +55,23 @@ fn main() -> Result<(), slint::PlatformError> {
 
 
     let ui_handle = ui.as_weak();
-    let ref_db = Rc::clone(&reference_database);
     let work_db = Rc::clone(&working_database);
-    ui.on_update_search(move |target: SharedString| {
+    ui.on_update_search(move || {
         if let Some(ui) = ui_handle.upgrade() {
+            println!("update search callback called");
+            let search_vector: Vec<String> = vec![ // collect the data from the LineEdits
+                ui.get_inbox_name_var().to_string(),
+                ui.get_inbox_value_var().to_string(),
+                ui.get_inbox_type_var().to_string(),
+                ui.get_inbox_phone_var().to_string(),
+                ui.get_inbox_address_var().to_string(),
+                ui.get_inbox_scholarship_var().to_string()
+            ];
             let mut temp_database = work_db.borrow_mut();
-            *temp_database = ref_db.borrow().clone().search_column(&temp_database, &target.to_string());
+            *temp_database = search_column(&temp_database, search_vector);
+            println!("search column function called");
             update_table_display_from_database(&ui, &temp_database);
+            println!("update table display from database called");
         }
     }); 
 
@@ -69,6 +80,14 @@ fn main() -> Result<(), slint::PlatformError> {
 
 
 
+    /*
+    when edit, call function that gets the values of all of the LineEdit inputs
+
+
+    
+    
+    
+     */
 
 
 

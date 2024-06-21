@@ -6,6 +6,13 @@ export component AppWindow inherits Window {
     in property <[[StandardListViewItem]]> table-data; // 2d vector of values excluding the header row
     in property <[TableColumn]> header-data; // 1d vector of values that is just the header row/column titles
 
+    in-out property <string> inbox-name-var;
+    in-out property <string> inbox-value-var;
+    in-out property <string> inbox-type-var;
+    in-out property <string> inbox-phone-var;
+    in-out property <string> inbox-address-var;
+    in-out property <string> inbox-scholarship-var;
+
     callback hide_column(string);
     callback show_column(string);
     callback hide_name();
@@ -14,7 +21,7 @@ export component AppWindow inherits Window {
     callback sort-descending(int);
     callback open_popup();
     callback close_popup();
-    callback update_search(string);
+    callback update_search();
     
 
     width: 1200px;
@@ -206,21 +213,24 @@ export component AppWindow inherits Window {
                         height: parent.height;
                         font-size: 14px;
                         placeholder-text: "Name";
-                        edited => { update_search(self.text); }
+                        text: inbox-name-var;
+                        edited => { update_search(); }
                     }
                     inbox-value := LineEdit {
                         y: parent.y;
                         height: parent.height;
                         font-size: 14px;
                         placeholder-text: "Value";
-                        edited => { update_search(self.text); }
+                        text: inbox-value-var;
+                        edited => { update_search(); }
                     }
                     inbox-type := LineEdit {
                         y: parent.y;
                         height: parent.height;
                         font-size: 14px;
                         placeholder-text: "Type";
-                        edited => { update_search(self.text); }
+                        text: inbox-type-var;
+                        edited => { update_search(); }
                     }
                 }
                 HorizontalBox {
@@ -233,21 +243,24 @@ export component AppWindow inherits Window {
                         height: parent.height;
                         font-size: 14px;
                         placeholder-text: "Phone Number";
-                        edited => { update_search(self.text); }
+                        text: inbox-phone-var;
+                        edited => { update_search(); }
                     }
                     inbox-address := LineEdit {
                         y: parent.y;
                         height: parent.height;
                         font-size: 14px;
                         placeholder-text: "Address";
-                        edited => { update_search(self.text); }
+                        text: inbox-address-var;
+                        edited => { update_search(); }
                     }
                     inbox-scholarship := LineEdit {
                         y: parent.y;
                         height: parent.height;
                         font-size: 14px;
                         placeholder-text: "Scholarship";
-                        edited => { update_search(self.text); }
+                        text: inbox-scholarship-var;
+                        edited => { update_search(); }
                     }
                 }
                 
