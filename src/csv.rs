@@ -284,17 +284,27 @@ impl Database {
                 //test equality for all substrings of target of the same length as target
                 let working_partner_clone = working_partner.clone();
                 // iterates through the given value of working_partner with a smaller length string (target_vec[target_index]) and checks each substring of that length against the target string
+                // DEBUG: adding the +1 does not seem to work but will require more testing
+                
+                if working_partner_clone.values[target_index].contains(target_vec[target_index].as_str()){
+                    temp_database.partners.push(working_partner_clone.clone());
+                }
+                // NOTE: still doesn't work as intended though but at least now it should be simpler to fix
+
+                /* // gotta love it when you try and fail to implement something then find out there is already a built in function for it
                 for i in 0..(working_partner_clone.values[target_index].len()-target_vec[target_index].len()){ // NOTE: may need a '+1' here, not sure
                     if target_vec[target_index].len() > working_partner_clone.values[target_index].len(){
                         // if target is longer than data_value, skip
                         continue 'search_within_column;
                     }
                     // checks if the respective substring of the working_partner_clone string is equal to the target_vec[target_index] string (* needed to dereference target_vec[target_index])
-                    if working_partner_clone.values[target_index][i..i+target_vec[target_index].len()] == *target_vec[target_index]{
+                    if working_partner_clone.values[target_index][i..i+target_vec[target_index].len()] == target_vec[target_index]{
                         // push this row to temp_database
                         temp_database.partners.push(working_partner_clone.clone());
                     }
                 }
+                */
+
             }
         }
     
