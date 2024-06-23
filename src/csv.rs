@@ -260,20 +260,24 @@ impl Database {
        
 
         // TODO: change loops to search through partners with the inner loop searching through partner.values
-        'search_within_column: for working_partner in &self.partners{    
-            'parse_each_column: for target_index in 0..self.headers.len(){
+        'search_through_partners: for working_partner in &self.partners{    
+            'parse_each_partner: for target_index in 0..self.headers.len(){
              // search the respective column
                 // if that row is already in the database, skip
                 // search by name (values[0])
              
                 // skip if partner already in temp_database
-                if temp_database.partners.iter().any(|partner| partner.values.len() > 0 && partner.values[0] == working_partner.values[0]) {
-                    continue 'search_within_column;
-                }
+                // SHOULD ONLY CONTINUE IF IN THE BLACKLIST DATABASE (just beacuse it passed one filter does not mean it will pass the others)
+                /* 
+                if temp_database.partners.iter().any(|partner| partner.values.len() > 0 && partner.values[target_index] == working_partner.values[target_index]) {
+                    println!("DEBUG: partner already in temp_database");
+                    continue 'search_through_partners; // jump to next partner in self.partners
+                }*/
 
                 // skip if partner already in blacklist_database (doesn't fit pattern (must fit all patterns))
-                if blacklist_database.partners.iter().any(|partner| partner.values.len() > 0 && partner.values[0] == working_partner.values[0]) {
-                    continue 'search_within_column;
+                if blacklist_database.partners.iter().any(|partner| partner.values.len() > 0 && partner.values[target_index] == working_partner.values[target_index]) {
+                    print!("DEBUG: partner already in blacklist_database | ");
+                    continue 'search_through_partners; // jump to next partner in self.partners
                 }
                 
 
@@ -281,18 +285,38 @@ impl Database {
                 // target[target_index] // string to search for
                 //test equality for all substrings of target of the same length as target
                 let working_partner_clone = working_partner.clone();
-                // iterates through the given value of working_partner with a smaller length string (target_vec[target_index]) and checks each substring of that length against the target string
                 // DEBUG: adding the +1 does not seem to work but will require more testing
                 //println!("DEBUG: working_partner_clone.values[target_index] {}", working_partner_clone.values[target_index]);
                 //println!("DEBUG: target_vec[target_index] {}", target_vec[target_index]);
-                if working_partner_clone.values.len() > 0 && working_partner_clone.values[target_index].contains(target_vec[target_index].as_str()){
-                    temp_database.partners.push(working_partner_clone.clone());
-                    println!("DEBUG: {} added to temp_database", working_partner_clone.values[0]);
+                if working_partner_clone.values.len() > 0 && working_partner_clone.values[target_index].contains(target_vec[target_index].as_str()){ // if target string found
+                    // TODO: only add if not already in temp_database ========================= (the below implementation with the if/else is not working)
+                    // also needs to pop from temp_database if in blacklist_database
+                    if temp_database.partners.iter().any(|partner| partner.values.len() > 0 && partner.values[target_index] == working_partner_clone.values[target_index]) { // if in temp_database
+                        print!("DEBUG: {} already in temp_database | ", working_partner_clone.values[target_index]);
+                        continue 'parse_each_partner;
+                    } else {
+                        temp_database.partners.push(working_partner_clone.clone());
+                        print!("DEBUG: {} added to temp_database | ", working_partner_clone.values[target_index]);
+                    }
+                } else {
+                    if blacklist_database.partners.iter().any(|partner| partner.values.len() > 0 && partner.values[target_index] == working_partner_clone.values[target_index]) { // if in blacklist_database
+                    // TODO: only add if not already in blacklist_database ======================== (the below implementation with the if/else is not working)
+                    // also needs to pop from temp_database if in blacklist_database
+
+                        print!("DEBUG: {} already in blacklist_database | ", working_partner_clone.values[target_index]);
+                        continue 'parse_each_partner;
+                    } else {
+                        // remove from temp_database
+                        if temp_database.partners.iter().any(|partner| partner.values.len() > 0 && partner.values[target_index] == working_partner_clone.values[target_index]) {
+                            temp_database.partners.retain(|partner| partner.values.len() > 0 &&partner.values[target_index] != working_partner_clone.values[target_index]);
+                        }
+                        // add to blacklist_database
+                        blacklist_database.partners.push(working_partner_clone.clone());
+                        if working_partner_clone.values.len() > 0 {print!("DEBUG: {} added to blacklist_database | ", working_partner_clone.values[target_index])};
+                    }
                 }
-                else {
-                    blacklist_database.partners.push(working_partner_clone.clone());
-                    if working_partner_clone.values.len() > 0 {println!("DEBUG: {} added to blacklist_database", working_partner_clone.values[0])};
-                }
+                print!("DEBUG: target_index {} | ", target_index);
+                println!("");
                
 
             }
