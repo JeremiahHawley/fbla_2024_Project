@@ -214,7 +214,10 @@ export component AppWindow inherits Window {
                         font-size: 14px;
                         placeholder-text: "Name";
                         text: inbox-name-var;
-                        edited => { update_search(); }
+                        edited => { 
+                            inbox-name-var = self.text; 
+                            update_search(); 
+                        }
                     }
                     inbox-value := LineEdit {
                         y: parent.y;
@@ -222,7 +225,10 @@ export component AppWindow inherits Window {
                         font-size: 14px;
                         placeholder-text: "Value";
                         text: inbox-value-var;
-                        edited => { update_search(); }
+                        edited => { 
+                            inbox-value-var = self.text;
+                            update_search(); 
+                        }
                     }
                     inbox-type := LineEdit {
                         y: parent.y;
@@ -230,7 +236,10 @@ export component AppWindow inherits Window {
                         font-size: 14px;
                         placeholder-text: "Type";
                         text: inbox-type-var;
-                        edited => { update_search(); }
+                        edited => { 
+                            inbox-type-var = self.text;
+                            update_search(); 
+                        }
                     }
                 }
                 HorizontalBox {
@@ -244,7 +253,10 @@ export component AppWindow inherits Window {
                         font-size: 14px;
                         placeholder-text: "Phone Number";
                         text: inbox-phone-var;
-                        edited => { update_search(); }
+                        edited => { 
+                            inbox-phone-var = self.text;
+                            update_search();
+                        }
                     }
                     inbox-address := LineEdit {
                         y: parent.y;
@@ -252,7 +264,10 @@ export component AppWindow inherits Window {
                         font-size: 14px;
                         placeholder-text: "Address";
                         text: inbox-address-var;
-                        edited => { update_search(); }
+                        edited => { 
+                            inbox-address-var = self.text;
+                            update_search(); 
+                        }
                     }
                     inbox-scholarship := LineEdit {
                         y: parent.y;
@@ -260,7 +275,10 @@ export component AppWindow inherits Window {
                         font-size: 14px;
                         placeholder-text: "Scholarship";
                         text: inbox-scholarship-var;
-                        edited => { update_search(); }
+                        edited => { 
+                            inbox-scholarship-var = self.text;
+                            update_search(); 
+                        }
                     }
                 }
                 
