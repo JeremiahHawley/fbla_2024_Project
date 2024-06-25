@@ -56,8 +56,8 @@ impl Partner{
 
 #[derive(Clone, PartialEq)]
 pub struct Database {
-    partners: Vec<Partner>,
-    headers: Vec<String>,
+    pub partners: Vec<Partner>,
+    pub headers: Vec<String>,
 }
 impl Database {
     pub fn add_column(mut self, header: &str){
@@ -244,11 +244,31 @@ impl Database {
 
 
     
-        let mut temp_database: Database = new_database();
-        temp_database.headers = database.headers.clone();
+        
 
+
+        // TODO: truncate the self width(reference database (doesn't affect the actual reference database in main.rs I DON'T THINK))
+        // make a copy of self just to make sure we don't change the original in main.rs
+        // use database since is working_database and has the data for which columns are hidden
+        // compare self (reference database) with database (working_database) to see which columns are hidden and truncate the copy of self accordingly and then use that copy instead of self in the rest of the function
+
+        let mut reference_database_copy: Database = new_database();
+        reference_database_copy.headers = self.headers.clone();
+        reference_database_copy.partners = self.partners.clone();
+
+        reference_database_copy.headers.retain(|header| {database.headers.contains(header)}); // keep all headers that are in the working_database
+        reference_database_copy.partners.retain(|partner| {database.partners.contains(partner)}); // keep all partners that are in the working_database
+
+
+
+        let mut temp_database: Database = new_database(); 
+        temp_database.headers = reference_database_copy.headers.clone();
+        
         let mut blacklist_database: Database = new_database();
-        blacklist_database.headers = self.headers.clone();
+        blacklist_database.headers = reference_database_copy.headers.clone();
+
+
+
 
         // if the target_vec is shorter than the database, use the shorter length
         // uses variable shadowing instead of mutability
@@ -260,8 +280,8 @@ impl Database {
        
 
         // TODO: change loops to search through partners with the inner loop searching through partner.values
-        'search_through_partners: for working_partner in &self.partners{    
-            'parse_each_partner: for target_index in 0..self.headers.len(){
+        'search_through_partners: for working_partner in &reference_database_copy.partners{    
+            'parse_each_partner: for target_index in 0..reference_database_copy.headers.len(){
              // search the respective column
                 // if that row is already in the database, skip
                 // search by name (values[0])
@@ -271,13 +291,13 @@ impl Database {
                 /* 
                 if temp_database.partners.iter().any(|partner| partner.values.len() > 0 && partner.values[target_index] == working_partner.values[target_index]) {
                     println!("DEBUG: partner already in temp_database");
-                    continue 'search_through_partners; // jump to next partner in self.partners
+                    continue 'search_through_partners; // jump to next partner in reference_database_copy.partners
                 }*/
 
                 // skip if partner already in blacklist_database (doesn't fit pattern (must fit all patterns))
                 if blacklist_database.partners.iter().any(|partner| partner.values.len() > 0 && partner.values[target_index] == working_partner.values[target_index]) {
                     print!("DEBUG: partner already in blacklist_database | ");
-                    continue 'search_through_partners; // jump to next partner in self.partners
+                    continue 'search_through_partners; // jump to next partner in reference_database_copy.partners
                 }
                 
 
@@ -289,7 +309,7 @@ impl Database {
                 //println!("DEBUG: working_partner_clone.values[target_index] {}", working_partner_clone.values[target_index]);
                 //println!("DEBUG: target_vec[target_index] {}", target_vec[target_index]);
                 if working_partner_clone.values.len() > 0 && working_partner_clone.values[target_index].contains(target_vec[target_index].as_str()){ // if target string found
-                    // TODO: only add if not already in temp_database ========================= (the below implementation with the if/else is not working)
+                    // only add if not already in temp_database 
                     // also needs to pop from temp_database if in blacklist_database
                     if temp_database.partners.iter().any(|partner| partner.values.len() > 0 && partner.values[target_index] == working_partner_clone.values[target_index]) { // if in temp_database
                         print!("DEBUG: {} already in temp_database | ", working_partner_clone.values[target_index]);
@@ -300,9 +320,8 @@ impl Database {
                     }
                 } else {
                     if blacklist_database.partners.iter().any(|partner| partner.values.len() > 0 && partner.values[target_index] == working_partner_clone.values[target_index]) { // if in blacklist_database
-                    // TODO: only add if not already in blacklist_database ======================== (the below implementation with the if/else is not working)
+                    // only add if not already in blacklist_database 
                     // also needs to pop from temp_database if in blacklist_database
-
                         print!("DEBUG: {} already in blacklist_database | ", working_partner_clone.values[target_index]);
                         continue 'parse_each_partner;
                     } else {
@@ -429,9 +448,8 @@ fn file_to_string(filepath: &str) -> String{
     }
     return value;
 }
-
-pub fn db_to_2d_vec(db: Database) -> Vec<Vec<String>> {
-    let mut return_vector: Vec<Vec<String>> = Vec::new();
+pub fn db_to_2d_vec(db: Database, shown_headers: Vec<String>) -> Vec<Vec<String>> {
+    let mut return_vector: Vec<Vec<String>> = Vec::new(); // entire database (headers and body)
     let mut header_row: Vec<String> = Vec::new();
     for header in db.headers{
         header_row.push(header);
@@ -444,6 +462,8 @@ pub fn db_to_2d_vec(db: Database) -> Vec<Vec<String>> {
         }
         return_vector.push(temp_vector);
     }
+
+    return_vector.retain(|element| {shown_headers.contains(&element[0])}); //element where element[0] is in shown_headers
     return return_vector;
 }
 fn write_to_csv(file_path: &str, text: &str) -> io::Result<()> {

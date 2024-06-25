@@ -19,13 +19,18 @@ use std::cell::RefCell;
 
 fn main() -> Result<(), slint::PlatformError> {
     let ui = AppWindow::new()?;
+    let CSV_FILEPATH: &str = "src/test.csv";
 
     // Rc is used for multiple ownership so that it can be passed to the callbacks
     // RefCell is used so these other owners can mutate the database
-    let mut reference_database: Rc<RefCell<Database>> = Rc::new(RefCell::new(csv::load_from_csv("src/test.csv")));
+    let mut reference_database: Rc<RefCell<Database>> = Rc::new(RefCell::new(csv::load_from_csv(CSV_FILEPATH)));
     let mut working_database: Rc<RefCell<Database>> = Rc::new(RefCell::new(reference_database.borrow().clone())); // initial working database
     update_table_display_from_database(&ui, &reference_database.borrow()); // initial table display
 
+    let header_db: Database = csv::load_from_csv(CSV_FILEPATH);
+    let shown_headers: Vec<String> = header_db.headers.clone();
+    header_db.drop();
+    
 
     // DEFINE CALLBACKS
 
@@ -58,7 +63,6 @@ fn main() -> Result<(), slint::PlatformError> {
     let work_db = Rc::clone(&working_database);
     ui.on_update_search(move || {
         if let Some(ui) = ui_handle.upgrade() {
-            println!("update search callback called");
             let search_vector: Vec<String> = vec![ // collect the data from the LineEdits
                 ui.get_inbox_name_var().to_string(),
                 ui.get_inbox_value_var().to_string(),
@@ -69,9 +73,7 @@ fn main() -> Result<(), slint::PlatformError> {
             ];
             let mut temp_database = work_db.borrow_mut();
             *temp_database = ref_db.borrow().clone().search_column(&temp_database, search_vector);
-            println!("search column function called");
             update_table_display_from_database(&ui, &temp_database);
-            println!("update table display from database called");
         }
     }); 
 
@@ -172,10 +174,10 @@ fn update_table_display_from_database(ui: &AppWindow, database: &Database) {
 
 
 fn header_list_from_database(database: csv::Database) -> Vec<String> {
-    return csv::db_to_2d_vec(database)[0].clone();
+    return csv::db_to_2d_vec(database, shown_headers)[0].clone();
 }
 fn body_list_from_database(database: csv::Database) -> Vec<Vec<String>> {
-    return csv::db_to_2d_vec(database)[1..].to_vec();
+    return csv::db_to_2d_vec(database, shown_headers)[1..].to_vec();
 }
 
 
