@@ -16,25 +16,54 @@ use slint::{ ModelRc, StandardListViewItem, TableColumn, VecModel, SharedString}
 use std::rc::Rc;
 use std::cell::RefCell;
 
+const CSV_FILEPATH: &str = "src/test.csv";
 
 fn main() -> Result<(), slint::PlatformError> {
     let ui = AppWindow::new()?;
-    let CSV_FILEPATH: &str = "src/test.csv";
+
 
     // Rc is used for multiple ownership so that it can be passed to the callbacks
     // RefCell is used so these other owners can mutate the database
     let mut reference_database: Rc<RefCell<Database>> = Rc::new(RefCell::new(csv::load_from_csv(CSV_FILEPATH)));
     let mut working_database: Rc<RefCell<Database>> = Rc::new(RefCell::new(reference_database.borrow().clone())); // initial working database
-    update_table_display_from_database(&ui, &reference_database.borrow()); // initial table display
 
-    let header_db: Database = csv::load_from_csv(CSV_FILEPATH);
-    let shown_headers: Vec<String> = header_db.headers.clone();
-    header_db.drop();
-    
+    let mut shown_headers: Rc<RefCell<Vec<String>>> = Rc::new(RefCell::new(csv::load_from_csv(CSV_FILEPATH).headers.clone()));
+    let reference_headers: Rc<RefCell<Vec<String>>> = Rc::new(RefCell::new(shown_headers.borrow().clone()));
+
+
+    update_table_display_from_database(&ui, &reference_database.borrow(), Rc::new(RefCell::new(Vec::new()))); // initial table display
+
 
     // DEFINE CALLBACKS
 
- 
+    let ui_handle = ui.as_weak();
+    let shown_headers_copy = Rc::clone(&shown_headers);
+    let reference_headers_copy = Rc::clone(&reference_headers);
+    ui.on_update_shown_headers(move || {
+        if let Some(ui) = ui_handle.upgrade() {
+            let reference_headers_internal = reference_headers_copy.borrow();
+            let mut shown_headers_internal = shown_headers_copy.borrow_mut();
+            let mut hidden_headers_bool_vec: Vec<bool> = vec![
+                // NOTE: if the hide buttons correspond to the wrong columns, switch the orders of the following get functions/elements to be in the same order as the column headers
+                ui.get_is_name_hidden(),
+                ui.get_is_address_hidden(),
+                ui.get_is_phone_number_hidden(),
+                ui.get_is_value_hidden(),
+                ui.get_is_type_hidden(),
+                ui.get_is_scholarship_hidden()
+            ];
+            // reference headers index combined with the index and value of hidden headers bool vec determines if its added
+            hidden_headers_bool_vec.truncate(reference_headers_internal.len());
+            shown_headers_internal.clear();
+            for i in 0..hidden_headers_bool_vec.len() {
+                if hidden_headers_bool_vec[i] {
+                    shown_headers_internal.push(reference_headers_internal[i].clone());
+                }
+            }
+        }
+    });
+
+ /* 
     let ui_handle = ui.as_weak();
     let ref_db = Rc::clone(&reference_database);
     let work_db = Rc::clone(&working_database);
@@ -42,7 +71,7 @@ fn main() -> Result<(), slint::PlatformError> {
         if let Some(ui) = ui_handle.upgrade() {
             let mut temp_database = work_db.borrow_mut();
             *temp_database = ref_db.borrow().clone().delete_column(&temp_database, input);
-            update_table_display_from_database(&ui, &temp_database);
+            update_table_display_from_database(&ui, &temp_database, shown_headers);
         }
     });
 
@@ -53,16 +82,30 @@ fn main() -> Result<(), slint::PlatformError> {
         if let Some(ui) = ui_handle.upgrade() {
             let mut temp_database = work_db.borrow_mut();
             *temp_database = ref_db.borrow().clone().show_column(&temp_database, input);
-            update_table_display_from_database(&ui, &temp_database);
+            update_table_display_from_database(&ui, &temp_database, shown_headers);
         }
     }); 
-
+*/
 
     let ui_handle = ui.as_weak();
     let ref_db = Rc::clone(&reference_database);
     let work_db = Rc::clone(&working_database);
+    let shown_headers_copy = Rc::clone(&shown_headers);
+    ui.on_update_table_display(move || {
+        if let Some(ui) = ui_handle.upgrade() {
+            let shown_headers_internal = shown_headers_copy.clone();
+            let mut temp_database = work_db.borrow_mut();
+            update_table_display_from_database(&ui, &temp_database, shown_headers_internal);
+        }
+    });
+
+    let ui_handle = ui.as_weak();
+    let ref_db = Rc::clone(&reference_database);
+    let work_db = Rc::clone(&working_database);
+    let shown_headers_copy = Rc::clone(&shown_headers);
     ui.on_update_search(move || {
         if let Some(ui) = ui_handle.upgrade() {
+            let shown_headers_internal = shown_headers_copy.clone();
             let search_vector: Vec<String> = vec![ // collect the data from the LineEdits
                 ui.get_inbox_name_var().to_string(),
                 ui.get_inbox_value_var().to_string(),
@@ -73,7 +116,7 @@ fn main() -> Result<(), slint::PlatformError> {
             ];
             let mut temp_database = work_db.borrow_mut();
             *temp_database = ref_db.borrow().clone().search_column(&temp_database, search_vector);
-            update_table_display_from_database(&ui, &temp_database);
+            update_table_display_from_database(&ui, &temp_database, shown_headers_internal);
         }
     }); 
 
@@ -159,9 +202,9 @@ fn main() -> Result<(), slint::PlatformError> {
 
 
 
-fn update_table_display_from_database(ui: &AppWindow, database: &Database) {
-    let mut header_list: Vec<String> = header_list_from_database(database.clone());
-    let mut body_list: Vec<Vec<String>> = body_list_from_database(database.clone());
+fn update_table_display_from_database(ui: &AppWindow, database: &Database, shown_headers: Rc<RefCell<Vec<String>>>) {
+    let mut header_list: Vec<String> = header_list_from_database(database.clone(), shown_headers.clone());
+    let mut body_list: Vec<Vec<String>> = body_list_from_database(database.clone(), shown_headers.clone());
 
     // Convert the data from the csv file into types that slint uses
     let transformed_header_list = transform_header_list(header_list);
@@ -173,11 +216,11 @@ fn update_table_display_from_database(ui: &AppWindow, database: &Database) {
 }
 
 
-fn header_list_from_database(database: csv::Database) -> Vec<String> {
-    return csv::db_to_2d_vec(database, shown_headers)[0].clone();
+fn header_list_from_database(database: csv::Database, shown_headers: Rc<RefCell<Vec<String>>>) -> Vec<String> {
+    return csv::db_to_2d_vec(database, shown_headers.borrow().clone())[0].clone();
 }
-fn body_list_from_database(database: csv::Database) -> Vec<Vec<String>> {
-    return csv::db_to_2d_vec(database, shown_headers)[1..].to_vec();
+fn body_list_from_database(database: csv::Database, shown_headers: Rc<RefCell<Vec<String>>>) -> Vec<Vec<String>> {
+    return csv::db_to_2d_vec(database, shown_headers.borrow().clone())[1..].to_vec();
 }
 
 

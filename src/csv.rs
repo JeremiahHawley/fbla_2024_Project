@@ -173,6 +173,7 @@ impl Database {
         }
         self.partners[name_index].values[header_index] = value.clone();
     }
+    /* 
     pub fn save_to_csv(self) -> io::Result<()> {
         let mut string_to_write = String::new();
         let two_vec: Vec<Vec<String>> = db_to_2d_vec(self);
@@ -184,6 +185,7 @@ impl Database {
         }
         write_to_csv(FILE_PATH, &mut string_to_write)
     }
+    */
     
     // Returns a new database with the specified row hidden
     pub fn hide_row(self, name: &String) -> Database{
@@ -199,16 +201,8 @@ impl Database {
         return temp_database;
     }
 
-    /* SHOULDNT NEED THIS (use delete_column) 
-    pub fn hide_column(self, header: &str) -> Database{
-        let mut temp_database: Database = Database {
-            partners: Vec::new(),
-            headers: Vec::new(),
-        };
-
-        return temp_database;
-    }
-    */
+    
+    
     pub fn sort_by_column(){
         // TODO: implement FUNCTION ===================================================================
     }
@@ -454,7 +448,7 @@ pub fn db_to_2d_vec(db: Database, shown_headers: Vec<String>) -> Vec<Vec<String>
     for header in db.headers{
         header_row.push(header);
     }
-    return_vector.push(header_row);
+    return_vector.push(header_row.clone());
     for partner in db.partners{
         let mut temp_vector: Vec<String> = Vec::new(); 
         for value in partner.values{
@@ -463,8 +457,15 @@ pub fn db_to_2d_vec(db: Database, shown_headers: Vec<String>) -> Vec<Vec<String>
         return_vector.push(temp_vector);
     }
 
-    return_vector.retain(|element| {shown_headers.contains(&element[0])}); //element where element[0] is in shown_headers
-    return return_vector;
+    // Filter out all columns where the header is not in the shown_headers vec
+    return return_vector.into_iter()
+        .map(|row| {
+            row.into_iter()
+                .enumerate()
+                .filter(|(i, _)| { !shown_headers.contains(&header_row[*i])})
+                .map(|(_, value)| {value})
+                .collect::<Vec<_>>()
+        }).collect::<Vec<_>>();
 }
 fn write_to_csv(file_path: &str, text: &str) -> io::Result<()> {
     let mut file = File::create(file_path)?;    

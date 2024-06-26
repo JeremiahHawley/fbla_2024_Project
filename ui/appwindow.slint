@@ -13,6 +13,15 @@ export component AppWindow inherits Window {
     in-out property <string> inbox-address-var;
     in-out property <string> inbox-scholarship-var;
 
+    in-out property <bool> is-name-hidden;
+    in-out property <bool> is-value-hidden;
+    in-out property <bool> is-type-hidden;
+    in-out property <bool> is-phone-number-hidden;
+    in-out property <bool> is-address-hidden;
+    in-out property <bool> is-scholarship-hidden;
+
+
+
     callback hide_column(string);
     callback show_column(string);
     callback hide_name();
@@ -22,6 +31,8 @@ export component AppWindow inherits Window {
     callback open_popup();
     callback close_popup();
     callback update_search();
+    callback update_shown_headers();
+    callback update_table_display();
     
 
     width: 1200px;
@@ -135,7 +146,13 @@ export component AppWindow inherits Window {
                     width: 50px;
                     height: 50px;
                     text: "Name";
-                    toggled => { if (self.checked) {hide_column(self.text)} else {show_column(self.text)}}
+                    checked: root.is-name-hidden;
+                    toggled => { 
+                        if (self.checked) {hide_column(self.text)} else {show_column(self.text)};
+                        root.is-name-hidden = self.checked;
+                        update_shown_headers();
+                        update_table_display();
+                    }
                 }
                 is_value_hidden := CheckBox {
                     x: parent.width*(1/4);
@@ -143,7 +160,13 @@ export component AppWindow inherits Window {
                     width: 50px;
                     height: 50px;
                     text: "resource_one";
-                    toggled => { if (self.checked) {hide_column(self.text)} else {show_column(self.text)}}
+                    checked: root.is-value-hidden;
+                    toggled => { 
+                        if (self.checked) {hide_column(self.text)} else {show_column(self.text)};
+                        root.is-value-hidden = self.checked;
+                        update_shown_headers();
+                        update_table_display();
+                    }
                 }
                 is_type_hidden := CheckBox {
                     x: parent.width*(1/4);
@@ -151,7 +174,13 @@ export component AppWindow inherits Window {
                     width: 50px;
                     height: 50px;
                     text: "Type";
-                    toggled => { if (self.checked) {hide_column(self.text)} else {show_column(self.text)}}
+                    checked: root.is-type-hidden;
+                    toggled => { 
+                        if (self.checked) {hide_column(self.text)} else {show_column(self.text)};
+                        root.is-type-hidden = self.checked;
+                        update_shown_headers();
+                        update_table_display();
+                    }
                 }
                 is_phone_number_hidden := CheckBox {
                     x: parent.width*(3/5);
@@ -159,7 +188,13 @@ export component AppWindow inherits Window {
                     width: 50px;
                     height: 50px;
                     text: "Number";
-                    toggled => { if (self.checked) {hide_column(self.text)} else {show_column(self.text)}}
+                    checked: root.is-phone-number-hidden;
+                    toggled => { 
+                        if (self.checked) {hide_column(self.text)} else {show_column(self.text)};
+                        root.is-phone-number-hidden = self.checked;
+                        update_shown_headers();
+                        update_table_display();
+                    }
                 }
                 is_address_hidden := CheckBox {
                     x: parent.width*(3/5);
@@ -167,7 +202,13 @@ export component AppWindow inherits Window {
                     width: 50px;
                     height: 50px;
                     text: "Address";
-                    toggled => { if (self.checked) {hide_column(self.text)} else {show_column(self.text)}}
+                    checked: root.is-address-hidden;
+                    toggled => { 
+                        if (self.checked) {hide_column(self.text)} else {show_column(self.text)};
+                        root.is-address-hidden = self.checked;
+                        update_shown_headers();
+                        update_table_display();
+                    }
                 }
                 is_scholarship_hidden := CheckBox {
                     x: parent.width*(3/5);
@@ -175,7 +216,13 @@ export component AppWindow inherits Window {
                     width: 50px;
                     height: 50px;
                     text: "Scholarship";
-                    toggled => { if (self.checked) {hide_column(self.text)} else {show_column(self.text)}}
+                    checked: root.is-scholarship-hidden;
+                    toggled => { 
+                        if (self.checked) {hide_column(self.text)} else {show_column(self.text)};
+                        root.is-scholarship-hidden = self.checked;
+                        update_shown_headers();
+                        update_table_display();
+                    }
                 }
             }
         }
