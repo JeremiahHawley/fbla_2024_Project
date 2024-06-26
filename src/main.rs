@@ -1,13 +1,5 @@
 mod csv;
 
-/* 
-
-fn main() {
-    let _ = csv::test_file_reading();
-    csv::hello_csv();
-    gui::hello_gui();
-}
-*/
 
 slint::include_modules!();
 
@@ -63,29 +55,6 @@ fn main() -> Result<(), slint::PlatformError> {
         }
     });
 
- /* 
-    let ui_handle = ui.as_weak();
-    let ref_db = Rc::clone(&reference_database);
-    let work_db = Rc::clone(&working_database);
-    ui.on_hide_column(move |input: SharedString| {
-        if let Some(ui) = ui_handle.upgrade() {
-            let mut temp_database = work_db.borrow_mut();
-            *temp_database = ref_db.borrow().clone().delete_column(&temp_database, input);
-            update_table_display_from_database(&ui, &temp_database, shown_headers);
-        }
-    });
-
-    let ui_handle = ui.as_weak();
-    let ref_db = Rc::clone(&reference_database);
-    let work_db = Rc::clone(&working_database);
-    ui.on_show_column(move |input: SharedString| {
-        if let Some(ui) = ui_handle.upgrade() {
-            let mut temp_database = work_db.borrow_mut();
-            *temp_database = ref_db.borrow().clone().show_column(&temp_database, input);
-            update_table_display_from_database(&ui, &temp_database, shown_headers);
-        }
-    }); 
-*/
 
     let ui_handle = ui.as_weak();
     let ref_db = Rc::clone(&reference_database);
@@ -136,8 +105,6 @@ fn main() -> Result<(), slint::PlatformError> {
 
 
 
-
-
     /* 
     // Sort ascending
     let ui_handle = ui.as_weak();
@@ -167,31 +134,6 @@ fn main() -> Result<(), slint::PlatformError> {
 */
 
 
-
-
-
-    /* 
-    let ui_handle = ui.as_weak();
-    let ref_db = Rc::clone(&reference_database);
-    let work_db = Rc::clone(&working_database);
-    ui.on_hide_name(move || { // TODO: I THINK WE NEED TO ADD NAME INTO THE VECTOR BECAUSE THE CHANGE NEEDS TO BE COMMUNICATED TO WORKING_DATABASE
-        if let Some(ui) = ui_handle.upgrade() {
-            let mut temp_database = work_db.borrow_mut();
-            *temp_database = ref_db.borrow().clone().show_column(&temp_database, input);
-            update_table_display_from_database(&ui, &temp_database);
-        }
-    }); 
-    */
-
-
-
-
-
-    //let ui_handle = ui.as_weak(); // currently unused but will be used for interactive ui
-    /* ui. on_request_increase_value (move || {
-        let ui = ui_handle.unwrap();
-        ui. set_counter(ui.get_counter () + 1);
-    }); */
 
     ui.run()
 }
