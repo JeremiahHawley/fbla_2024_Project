@@ -30,6 +30,8 @@ export component AppWindow inherits Window {
     callback update_search();
     callback update_shown_headers();
     callback update_table_display();
+    callback add_row();
+    callback delete_row();
     
 
     width: 1200px;
@@ -232,7 +234,7 @@ export component AppWindow inherits Window {
                     x: parent.x + parent.width*(1/3);
                     y: parent.y + parent.height/2;
                     text: "add record";
-                    clicked => {/* open dialog to enter new values*/}
+                    clicked => { add_row(); }
                 }
 
                 // TODO: add button to update/edit a record
@@ -241,7 +243,7 @@ export component AppWindow inherits Window {
                     x: parent.x + parent.width*(2/3);
                     y: parent.y + parent.height/2;
                     text: "delete record";
-                    clicked => {/*select row to delete and delete it*/}
+                    clicked => { delete_row(); }
                 }
                 
                 HorizontalBox {

@@ -43,9 +43,9 @@ use std::io::{self, Read, BufReader, Write};
 
 const FILE_PATH: &str = "data/db.csv";
 
-#[derive(Clone, PartialEq, Debug)] // allows Partner to be cloned and use == and !=
+#[derive(Clone, PartialEq, Debug, Eq, Hash)] // allows Partner to be cloned and use == and !=
 pub struct Partner {
-    values: Vec<String>,
+    pub values: Vec<String>,
 }
 impl Partner{
     pub fn return_values(&self) -> Vec<String>{self.values.clone()}
@@ -57,7 +57,7 @@ impl Partner{
     }
 }
 
-#[derive(Clone, PartialEq, Debug)]
+#[derive(Clone, PartialEq, Debug, Eq, Hash)]
 pub struct Database {
     pub partners: Vec<Partner>,
     pub headers: Vec<String>,
