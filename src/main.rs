@@ -1,6 +1,7 @@
+// TODO: REMOVE WHEN DONE ===========================================
+#![allow(warnings)]
+
 mod csv;
-
-
 slint::include_modules!();
 
 use csv::Database;
@@ -8,7 +9,7 @@ use slint::{ ModelRc, StandardListViewItem, TableColumn, VecModel, SharedString}
 use std::rc::Rc;
 use std::cell::RefCell;
 
-const CSV_FILEPATH: &str = "src/test.csv";
+const CSV_FILEPATH: &str = "data/db.csv";
 
 fn main() -> Result<(), slint::PlatformError> {
     let ui = AppWindow::new()?;
@@ -22,8 +23,10 @@ fn main() -> Result<(), slint::PlatformError> {
     let mut shown_headers: Rc<RefCell<Vec<String>>> = Rc::new(RefCell::new(csv::load_from_csv(CSV_FILEPATH).headers.clone()));
     let reference_headers: Rc<RefCell<Vec<String>>> = Rc::new(RefCell::new(shown_headers.borrow().clone()));
 
+    let mut which_sort_direction: Rc<RefCell<bool>> = Rc::new(RefCell::new(true));
 
-    update_table_display_from_database(&ui, &reference_database.borrow(), Rc::new(RefCell::new(Vec::new()))); // initial table display
+
+    update_table_display_from_database(&ui, &reference_database.borrow(), shown_headers.clone()); // initial table display
 
 
     // DEFINE CALLBACKS
@@ -37,12 +40,12 @@ fn main() -> Result<(), slint::PlatformError> {
             let mut shown_headers_internal = shown_headers_copy.borrow_mut();
             let mut hidden_headers_bool_vec: Vec<bool> = vec![
                 // NOTE: if the hide buttons correspond to the wrong columns, switch the orders of the following get functions/elements to be in the same order as the column headers
-                ui.get_is_name_hidden(),
-                ui.get_is_address_hidden(),
-                ui.get_is_phone_number_hidden(),
-                ui.get_is_value_hidden(),
-                ui.get_is_type_hidden(),
-                ui.get_is_scholarship_hidden()
+                !ui.get_is_name_hidden(),
+                !ui.get_is_address_hidden(),
+                !ui.get_is_phone_number_hidden(),
+                !ui.get_is_value_hidden(),
+                !ui.get_is_type_hidden(),
+                !ui.get_is_scholarship_hidden()
             ];
             // reference headers index combined with the index and value of hidden headers bool vec determines if its added
             hidden_headers_bool_vec.truncate(reference_headers_internal.len());
@@ -105,33 +108,32 @@ fn main() -> Result<(), slint::PlatformError> {
 
 
 
-    /* 
-    // Sort ascending
+    
+    // Sort
     let ui_handle = ui.as_weak();
     let ref_db = Rc::clone(&reference_database);
     let work_db = Rc::clone(&working_database);
-    ui.on_sort_ascending(move |input: i32| { // TODO: may need to convert between slint int and rust i32
+    let shown_headers_copy = Rc::clone(&shown_headers);
+    let which_sort_direction_copy = Rc::clone(&which_sort_direction);
+    ui.on_sort(move |column_index: i32| { // TODO: may need to convert between slint int and rust i32
         if let Some(ui) = ui_handle.upgrade() {
+            let shown_headers_internal = shown_headers_copy.clone();
+            let mut which_sort_direction_internal = which_sort_direction_copy.borrow_mut();
             let mut temp_database = work_db.borrow_mut();
-            // TODO: check correct function
-            *temp_database = ref_db.borrow().clone().sort_ascending_by_column(&temp_database, input); // TODO: add the correct column and check whether input is i32
-            update_table_display_from_database(&ui, &temp_database);
+            let mut ref_database_copy = ref_db.borrow_mut();
+            let comp_db = temp_database.clone();
+
+            if *which_sort_direction_internal {
+                *temp_database = ref_database_copy.clone().sort_ascending_by_column(column_index);
+            } else {
+                *temp_database = ref_database_copy.clone().sort_descending_by_column(column_index);
+            }
+            *which_sort_direction_internal = !which_sort_direction_internal.clone();
+            *ref_database_copy = temp_database.clone();
+            update_table_display_from_database(&ui, &temp_database, shown_headers_internal);
         }
     }); 
 
-    // Sort decending
-    let ui_handle = ui.as_weak();
-    let ref_db = Rc::clone(&reference_database);
-    let work_db = Rc::clone(&working_database);
-    ui.on_sort_decending(move |input: i32| {// TODO: may need to convert between slint int and rust i32
-        if let Some(ui) = ui_handle.upgrade() {
-            let mut temp_database = work_db.borrow_mut();
-            // TODO: check correct function
-            *temp_database = ref_db.borrow().clone().sort_decending_by_column(&temp_database, input); // TODO: add the correct column and check whether input is i32
-            update_table_display_from_database(&ui, &temp_database);
-        }
-    }); 
-*/
 
 
 

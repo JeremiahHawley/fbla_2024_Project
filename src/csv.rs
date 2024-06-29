@@ -32,15 +32,18 @@ fn sort_csv_by_column(column: &str, order: &str) -> Vec<Vec<&str>> {
 */
 
 
+// TODO: REMOVE WHEN DONE ===========================================
+#![allow(warnings)]
+
 use std::fs::File;
 use std::ptr::null;
 use std::rc::Rc;
 use std::cell::RefCell;
 use std::io::{self, Read, BufReader, Write};
 
-const FILE_PATH: &str = "src/test.csv";
+const FILE_PATH: &str = "data/db.csv";
 
-#[derive(Clone, PartialEq)] // allows Partner to be cloned and use == and !=
+#[derive(Clone, PartialEq, Debug)] // allows Partner to be cloned and use == and !=
 pub struct Partner {
     values: Vec<String>,
 }
@@ -54,7 +57,7 @@ impl Partner{
     }
 }
 
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 pub struct Database {
     pub partners: Vec<Partner>,
     pub headers: Vec<String>,
@@ -188,7 +191,7 @@ impl Database {
     */
     
     // Returns a new database with the specified row hidden
-    pub fn hide_row(self, name: &String) -> Database{
+    pub fn hide_row(self, name: &String) -> Database {
         let mut temp_database: Database = Database{
             partners: Vec::new(),
             headers: self.headers,
@@ -203,8 +206,42 @@ impl Database {
 
     
     
-    pub fn sort_by_column(){
-        // TODO: implement FUNCTION ===================================================================
+    pub fn sort_ascending_by_column(self, mut column_index: i32) -> Database {
+        // DEBUG: println!("DEBUG: sort ASC called");
+        column_index = if column_index < 0 {0} else {column_index};
+        let column_index_usize: usize = column_index as usize; // DEBUG: this conversion does not work ================================d
+        // transform database body into 2d vector
+        let mut body_vec: Vec<Vec<String>> = self.partners.into_iter().map(|partner| partner.values).collect();
+        // sort 2d vector using 
+        body_vec.sort_by(|a,b| a[column_index_usize].to_ascii_lowercase().cmp(&b[column_index_usize].to_ascii_lowercase()));
+        // transform 2d vector into new database
+        let mut temp_database = new_database();
+        temp_database.headers = self.headers.clone();
+        temp_database.partners = body_vec.into_iter().map(|row| Partner{values: row}).collect();
+        // return new database 
+        return temp_database;
+
+        // IMPORTANT: (new database will update the sorting of `reference_database` so make sure that is implemented)
+
+
+    }
+
+    pub fn sort_descending_by_column(self, mut column_index: i32) -> Database {
+        // DEBUG: println!("DEBUG: sord DESC called");
+        column_index = if column_index < 0 {0} else {column_index};
+        let column_index_usize: usize = column_index as usize;
+        // transform database body into 2d vector
+        let mut body_vec: Vec<Vec<String>> = self.partners.into_iter().map(|partner| partner.values).collect();
+        // sort 2d vector using 
+        body_vec.sort_by(|a,b| b[column_index_usize].to_ascii_lowercase().cmp(&a[column_index_usize].to_ascii_lowercase()));
+        // transform 2d vector into new database
+        let mut temp_database = new_database();
+        temp_database.headers = self.headers.clone();
+        temp_database.partners = body_vec.into_iter().map(|row| Partner{values: row}).collect();
+        // return new database 
+        return temp_database;
+
+        // IMPORTANT: (new database will update the sorting of `reference_database` so make sure that is implemented)
     }
 
     
@@ -217,11 +254,12 @@ impl Database {
     // TODO: use self for reference database and then call the hides to update those
     pub fn search_column(self, database: &Database, target_vec: Vec<String>) -> Database {
         // TODO: implement creation of target vector in main.rs to pass into this from the callback definition
-        println!("DEBUG: target_vec: {:?}", target_vec);
+        // DEBUG: println!("DEBUG: target_vec: {:?}", target_vec);
         // returns a WORKING DATABASE
         // TODO: add functionality for if the target_vec is shorter than database.headers.len()
         if target_vec.len() == 0 || self.partners.len() == 0 || target_vec.len() < self.headers.len(){
             // BEGIN DEBUG ===========================================================================
+            /*
             if target_vec.len() == 0{
                 println!("DEBUG: search column called with empty target_vec");
             }
@@ -232,13 +270,15 @@ impl Database {
                 println!("DEBUG: target_vec length does not match database headers length");
             }
             println!("DEBUG: search column called with incorrect data");
+            */
             // END DEBUG =============================================================================
             return self.clone();
         }
 
 
-    
-        
+        // TODO: make truncate in both directions work
+        // clean up comments and debug stuff
+        // make sure actually works
 
 
         // TODO: truncate the self width(reference database (doesn't affect the actual reference database in main.rs I DON'T THINK))
@@ -246,20 +286,12 @@ impl Database {
         // use database since is working_database and has the data for which columns are hidden
         // compare self (reference database) with database (working_database) to see which columns are hidden and truncate the copy of self accordingly and then use that copy instead of self in the rest of the function
 
-        let mut reference_database_copy: Database = new_database();
-        reference_database_copy.headers = self.headers.clone();
-        reference_database_copy.partners = self.partners.clone();
-
-        reference_database_copy.headers.retain(|header| {database.headers.contains(header)}); // keep all headers that are in the working_database
-        reference_database_copy.partners.retain(|partner| {database.partners.contains(partner)}); // keep all partners that are in the working_database
-
-
 
         let mut temp_database: Database = new_database(); 
-        temp_database.headers = reference_database_copy.headers.clone();
+        temp_database.headers = self.headers.clone();
         
         let mut blacklist_database: Database = new_database();
-        blacklist_database.headers = reference_database_copy.headers.clone();
+        blacklist_database.headers = self.headers.clone();
 
 
 
@@ -274,49 +306,41 @@ impl Database {
        
 
         // TODO: change loops to search through partners with the inner loop searching through partner.values
-        'search_through_partners: for working_partner in &reference_database_copy.partners{    
-            'parse_each_partner: for target_index in 0..reference_database_copy.headers.len(){
+        'search_through_partners: for working_partner in &self.partners{    
+            'parse_each_partner: for target_index in 0..self.headers.len(){
              // search the respective column
                 // if that row is already in the database, skip
                 // search by name (values[0])
              
                 // skip if partner already in temp_database
                 // SHOULD ONLY CONTINUE IF IN THE BLACKLIST DATABASE (just beacuse it passed one filter does not mean it will pass the others)
-                /* 
-                if temp_database.partners.iter().any(|partner| partner.values.len() > 0 && partner.values[target_index] == working_partner.values[target_index]) {
-                    println!("DEBUG: partner already in temp_database");
-                    continue 'search_through_partners; // jump to next partner in reference_database_copy.partners
-                }*/
 
                 // skip if partner already in blacklist_database (doesn't fit pattern (must fit all patterns))
                 if blacklist_database.partners.iter().any(|partner| partner.values.len() > 0 && partner.values[target_index] == working_partner.values[target_index]) {
-                    print!("DEBUG: partner already in blacklist_database | ");
+                    // DEBUG: print!("DEBUG: partner already in blacklist_database | ");
                     continue 'search_through_partners; // jump to next partner in reference_database_copy.partners
                 }
                 
-
                 //data_value.values[target_index] // string to search
                 // target[target_index] // string to search for
                 //test equality for all substrings of target of the same length as target
                 let working_partner_clone = working_partner.clone();
-                // DEBUG: adding the +1 does not seem to work but will require more testing
-                //println!("DEBUG: working_partner_clone.values[target_index] {}", working_partner_clone.values[target_index]);
-                //println!("DEBUG: target_vec[target_index] {}", target_vec[target_index]);
+
                 if working_partner_clone.values.len() > 0 && working_partner_clone.values[target_index].contains(target_vec[target_index].as_str()){ // if target string found
                     // only add if not already in temp_database 
                     // also needs to pop from temp_database if in blacklist_database
                     if temp_database.partners.iter().any(|partner| partner.values.len() > 0 && partner.values[target_index] == working_partner_clone.values[target_index]) { // if in temp_database
-                        print!("DEBUG: {} already in temp_database | ", working_partner_clone.values[target_index]);
+                        // DEBUG: print!("DEBUG: {} already in temp_database | ", working_partner_clone.values[target_index]);
                         continue 'parse_each_partner;
                     } else {
                         temp_database.partners.push(working_partner_clone.clone());
-                        print!("DEBUG: {} added to temp_database | ", working_partner_clone.values[target_index]);
+                        // DEBUG: print!("DEBUG: {} added to temp_database | ", working_partner_clone.values[target_index]);
                     }
                 } else {
                     if blacklist_database.partners.iter().any(|partner| partner.values.len() > 0 && partner.values[target_index] == working_partner_clone.values[target_index]) { // if in blacklist_database
                     // only add if not already in blacklist_database 
                     // also needs to pop from temp_database if in blacklist_database
-                        print!("DEBUG: {} already in blacklist_database | ", working_partner_clone.values[target_index]);
+                        // DEBUG: print!("DEBUG: {} already in blacklist_database | ", working_partner_clone.values[target_index]);
                         continue 'parse_each_partner;
                     } else {
                         // remove from temp_database
@@ -325,11 +349,11 @@ impl Database {
                         }
                         // add to blacklist_database
                         blacklist_database.partners.push(working_partner_clone.clone());
-                        if working_partner_clone.values.len() > 0 {print!("DEBUG: {} added to blacklist_database | ", working_partner_clone.values[target_index])};
+                        // DEBUG: if working_partner_clone.values.len() > 0 {print!("DEBUG: {} added to blacklist_database | ", working_partner_clone.values[target_index])};
                     }
                 }
-                print!("DEBUG: target_index {} | ", target_index);
-                println!("");
+                // DEBUG: print!("DEBUG: target_index {} | ", target_index);
+                // DEBUG: println!("");
                
 
             }
@@ -462,7 +486,7 @@ pub fn db_to_2d_vec(db: Database, shown_headers: Vec<String>) -> Vec<Vec<String>
         .map(|row| {
             row.into_iter()
                 .enumerate()
-                .filter(|(i, _)| { !shown_headers.contains(&header_row[*i])})
+                .filter(|(i, _)| { shown_headers.contains(&header_row[*i])})
                 .map(|(_, value)| {value})
                 .collect::<Vec<_>>()
         }).collect::<Vec<_>>();

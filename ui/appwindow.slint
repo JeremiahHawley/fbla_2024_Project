@@ -24,10 +24,7 @@ export component AppWindow inherits Window {
 
     callback hide_column(string);
     callback show_column(string);
-    callback hide_name();
-    callback show_name();
-    callback sort-ascending(int);
-    callback sort-descending(int);
+    callback sort(int);
     callback open_popup();
     callback close_popup();
     callback update_search();
@@ -46,7 +43,7 @@ export component AppWindow inherits Window {
         height: parent.height*(2/3);
 
         popup_background := Rectangle {
-            background: white;
+            background: lightgray;
             x: parent.x;
             y: parent.y;
             width: parent.width;
@@ -93,19 +90,22 @@ export component AppWindow inherits Window {
     }
 
     main_layout := HorizontalLayout { // creates an unnamed `HorizonalLayout`
+        // Image {
+        //     source: @image-url("https://picsum.photos/id/1/200/200");
+        // }
         left_side := VerticalLayout {
             min-width: 100px;
             horizontal-stretch: 0.5;
             
             menu_option := Rectangle { // creates a new `Rectangle` named "menu_option"
             // use `Button` to create a dropdown that has a selection, each of which when clicked creates a new
-                background: red;
+                background: lightgray;
                 min-height: 50px;
                 max-height: 100px;
                 vertical-stretch: 0.25;
 
                 hamburger := Rectangle { // TODO: ADD SAVE BUTTON
-                    background: blueviolet;
+                    background: darkgoldenrod;
                     x: parent.height*(0.175);
                     y: self.x;
                     width: parent.height*(0.65);
@@ -125,13 +125,7 @@ export component AppWindow inherits Window {
             }
 
             filter_options := Rectangle { 
-                background: orange;
-
-                Text {
-                    x: parent.width*(2/5);
-                    y: parent.height*(1/16);
-                    text: "Sort Options";
-                }
+                background: gray;
                 
 
                 Text {
@@ -230,7 +224,7 @@ export component AppWindow inherits Window {
         right_side := VerticalLayout { 
 
             add_new_record := Rectangle { // use `LineEdit` for text input, `CheckBox` for scholarship boolean, maybe others
-                background: white;
+                background: gray;
                 min-height: menu-option.min-height; // sets the dimensions to be the same as those of "menu_option"
                 vertical-stretch: menu-option.vertical-stretch;
 
@@ -328,23 +322,15 @@ export component AppWindow inherits Window {
                         }
                     }
                 }
-                
 
                  
                 }
-                    
-                
-        
-                
-
-
-                // TODO: add search menu bar thing that is like a single row where you can search for items by value like regex
 
 
             
 
             table_display := Rectangle { // add a scrollview to contain the tableview
-                background: green;
+                background: lightgray;
                 /*
                 ScrollView {
                     x: parent.x;
@@ -359,14 +345,16 @@ export component AppWindow inherits Window {
                         height: parent.height;
                         columns: header-data;
                         rows: table-data;
+                        
                         sort-ascending => {
                             // sort ascending by column
-                            sort-ascending(self.current-sort-column);
+                            sort(self.current-sort-column);
                         }
                         sort-descending => {
                             // sort decending by column
-                            sort-descending(self.current-sort-column);
+                            sort(self.current-sort-column);
                         }
+                        
                     }
                 //}
             }
@@ -374,85 +362,6 @@ export component AppWindow inherits Window {
     }
 }
 
-
-
-
-
-
-
-
-/*
-component Button inherits Rectangle {
-    // TODO: implement button component/struct
-}
-
-export component MainWindow inherits Window {
-    width: 400px; // logical pixels (before device specific scaling)
-    height: 400px;
-
-
-
-    // component member implementation (put into displayed window)
-}
-
-*/
-
-
-
-
-
-
-
-
-
-/*
-TouchArea { // when clicked (put this in the component)
-    clicked => {
-        // Delegate to the user of this element
-        root.clicked(); // root refers to the outermost element in the component
-    }
-}
-
-callback keyword is used to call a rust function outside of slint
-
-*/
-
-
-
-/* TODO: (some of the logic may need to go in gui.rs)
-
-Make good layout
-
-Buttons:
-    - implement the functions below
-
-Functions:
-- sort/filter table
-    - has scholarships
-    - alphabetically by name
-    - reverse alphabetically by name
-    - TODO: add more filters/sorts
-- edit table
-    - add
-    - update
-    - delete
-
-Windows/Modes/Menus:
-- help menu
-- import/export csv
-- settings menu
-- home menu
-- table view 
-
-Table Display:
-- sort options
-- filter options
-
-
-ADD GPT INTEGRATION FOR THE HELP
-
-
-*/
 
 
 
