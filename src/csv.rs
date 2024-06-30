@@ -176,19 +176,23 @@ impl Database {
         }
         self.partners[name_index].values[header_index] = value.clone();
     }
-    /* 
-    pub fn save_to_csv(self) -> io::Result<()> {
+     
+    pub fn save_to_csv(self, shown_headers: Rc<RefCell<Vec<String>>>) -> io::Result<()> {
         let mut string_to_write = String::new();
-        let two_vec: Vec<Vec<String>> = db_to_2d_vec(self);
+        let shown_headers_internal = shown_headers.borrow().clone();
+        let two_vec: Vec<Vec<String>> = db_to_2d_vec(self, shown_headers_internal);
+
         for vector in two_vec {
             for string in vector {
                 string_to_write += string.as_str();
+                string_to_write += ",";
             }
+            string_to_write.pop();
             string_to_write += "\n";
         }
         write_to_csv(FILE_PATH, &mut string_to_write)
     }
-    */
+    
     
     // Returns a new database with the specified row hidden
     pub fn hide_row(self, name: &String) -> Database {

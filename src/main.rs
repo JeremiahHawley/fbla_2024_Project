@@ -4,6 +4,7 @@
 mod csv;
 slint::include_modules!();
 
+use csv::load_from_csv;
 use csv::Database;
 use csv::Partner;
 use slint::{ ModelRc, StandardListViewItem, TableColumn, VecModel, SharedString};
@@ -104,21 +105,19 @@ fn main() -> Result<(), slint::PlatformError> {
             let shown_headers_internal = shown_headers_copy.clone();
             let mut temp_database = work_db.borrow_mut();
             let mut ref_database_copy = ref_db.borrow_mut();
-            if temp_database.clone().partners.len() <= 1 {
-                // add record
-                let mut temp_vec: Vec<String> = vec![
-                    ui.get_inbox_name_var().to_string(),
-                    ui.get_inbox_value_var().to_string(),
-                    ui.get_inbox_type_var().to_string(),
-                    ui.get_inbox_phone_var().to_string(),
-                    ui.get_inbox_address_var().to_string(),
-                    ui.get_inbox_scholarship_var().to_string(),
-                ];
-                if ref_database_copy.clone().partners.len() > 0 {temp_vec.truncate(ref_database_copy.clone().partners[0].values.len())};
-                temp_database.partners.push(Partner{values: temp_vec.clone()});
-                ref_database_copy.partners.push(Partner{values: temp_vec.clone()});
-                update_table_display_from_database(&ui, &temp_database, shown_headers_internal);
-            } 
+            // add record
+            let mut temp_vec: Vec<String> = vec![
+                ui.get_inbox_name_var().to_string(),
+                ui.get_inbox_value_var().to_string(),
+                ui.get_inbox_type_var().to_string(),
+                ui.get_inbox_phone_var().to_string(),
+                ui.get_inbox_address_var().to_string(),
+                ui.get_inbox_scholarship_var().to_string(),
+            ];
+            if ref_database_copy.clone().partners.len() > 0 {temp_vec.truncate(ref_database_copy.clone().partners[0].values.len())};
+            temp_database.partners.push(Partner{values: temp_vec.clone()});
+            ref_database_copy.partners.push(Partner{values: temp_vec.clone()});
+            update_table_display_from_database(&ui, &temp_database, shown_headers_internal);
         }
     });
 
@@ -148,25 +147,6 @@ fn main() -> Result<(), slint::PlatformError> {
         } 
     });
 
-
-
-
-
-
-
-
-
-
-
-
-
-    /*
-    when edit, call function that gets the values of all of the LineEdit inputs
-    
-    
-     */
-
-    // Sort
     let ui_handle = ui.as_weak();
     let ref_db = Rc::clone(&reference_database);
     let work_db = Rc::clone(&working_database);
@@ -191,10 +171,58 @@ fn main() -> Result<(), slint::PlatformError> {
     }); 
 
 
+    let ui_handle = ui.as_weak();
+    let ref_db = Rc::clone(&reference_database);
+    let reference_headers_copy = Rc::clone(&reference_headers);
+    ui.on_save_to_csv(move || {
+        if let Some(ui) = ui_handle.upgrade() {
+            let reference_headers_internal = reference_headers_copy.clone();
+            let ref_database_copy = ref_db.borrow();
+            ref_database_copy.clone().save_to_csv(reference_headers_internal);
+        }
+    });
+
+    let ui_handle = ui.as_weak();
+    let ref_db = Rc::clone(&reference_database);
+    let work_db = Rc::clone(&working_database);
+    let shown_headers_copy = Rc::clone(&shown_headers);
+    ui.on_load_from_csv(move || {
+        if let Some(ui) = ui_handle.upgrade() {
+            let shown_headers_internal = shown_headers_copy.clone();
+            let mut ref_database_copy = ref_db.borrow_mut();
+            let mut temp_database = work_db.borrow_mut();
+
+            *ref_database_copy = load_from_csv(CSV_FILEPATH);
+            *temp_database = ref_database_copy.clone();
+
+            //ui.invoke_update_search();
+            update_table_display_from_database(&ui, &temp_database, shown_headers_internal);
+        }
+    });
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     ui.run()
 }
+
+
+
+
+
+
+
 
 
 

@@ -32,6 +32,8 @@ export component AppWindow inherits Window {
     callback update_table_display();
     callback add_row();
     callback delete_row();
+    callback save_to_csv();
+    callback load_from_csv();
     
 
     width: 1200px;
@@ -128,6 +130,20 @@ export component AppWindow inherits Window {
 
             filter_options := Rectangle { 
                 background: gray;
+
+                load_csv := Button {
+                    x: parent.width*(1/4);
+                    y: parent.height*(1/7);
+                    text: "load from CSV";
+                    clicked => { load_from_csv(); }
+                }
+
+                save_csv := Button {
+                    x: parent.width*(3/5);
+                    y: parent.height*(1/7);
+                    text: "save to CSV";
+                    clicked => { save_to_csv(); }
+                }
                 
 
                 Text {
@@ -229,6 +245,33 @@ export component AppWindow inherits Window {
                 background: gray;
                 min-height: menu-option.min-height; // sets the dimensions to be the same as those of "menu_option"
                 vertical-stretch: menu-option.vertical-stretch;
+
+                clear_input_boxes := Button {
+                    x: parent.x;
+                    y: parent.y + parent.height/2;
+                    text: "clear inputs";
+                    clicked => {
+                        inbox-name.text = "";
+                        inbox-name-var = inbox-name.text;
+
+                        inbox-value.text = "";
+                        inbox-value-var = inbox-value.text;
+
+                        inbox-type.text = "";
+                        inbox-type-var = inbox-type.text;
+
+                        inbox-phone-number.text = "";
+                        inbox-phone-var = inbox-phone-number.text; 
+
+                        inbox-address.text = "";
+                        inbox-address-var = inbox-address.text;
+
+                        inbox-scholarship.text = "";
+                        inbox-scholarship-var = inbox-scholarship.text;
+
+                        update_search();
+                    }
+                }
 
                 add_record := Button {
                     x: parent.x + parent.width*(1/3);
