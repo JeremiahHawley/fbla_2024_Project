@@ -41,10 +41,10 @@ export component AppWindow inherits Window {
 
     popup := PopupWindow {
         close-on-click: false;
-        x: parent.width/6;
-        y: parent.height/6;
-        width: parent.width*(2/3);
-        height: parent.height*(2/3);
+        x: root.width*(0.28);
+        y: root.height*(0.23);
+        width: root.width*(1-0.28);
+        height: root.height*(1-0.23);
 
         popup_background := Rectangle {
             background: lightgray;
@@ -66,7 +66,7 @@ export component AppWindow inherits Window {
                     font-size: 24px;
                     wrap: word-wrap;
                     //font-weight: 4; // 100-900 (400 default)
-                    text: "Test Header";
+                    text: "Help Menu";
                 }
                 help_text := Text {
                     width: parent.width;
@@ -76,8 +76,7 @@ export component AppWindow inherits Window {
                     font-size: 14px;
                     //font-weight: 2; // 100-900 (400 default)
                     wrap: word-wrap;
-                    text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-                    
+                    text: "Add / Delete \nTo add or delete a value from a row, use the entry boxes in the middle of the top bar\nwhen you're done selecting or writing the entry, press the delete record or add record buttons\n\nSearch\nTo search for a record just type a value in the box correlating to the Column you'd like to search.\n\nFilter\nTo filter results, use the checkboxes on the left of your screen to select which \ncolumn you'd like to hide\n\nSort\nTo sort the data, click on the header box of the column you'd like to sort by\n\nSave / Load\nto save your changes to permanent storage, press the save to CSV button on the lefthand side of your screen, to reset data to the last save point press the load from CSV button";               
                 }
                 
                 exit_button := Button {
@@ -99,7 +98,7 @@ export component AppWindow inherits Window {
         // }
         left_side := VerticalLayout {
             min-width: 100px;
-            horizontal-stretch: 0.5;
+            horizontal-stretch: 0.3;
             
             menu_option := Rectangle { // creates a new `Rectangle` named "menu_option"
             // use `Button` to create a dropdown that has a selection, each of which when clicked creates a new
@@ -171,7 +170,7 @@ export component AppWindow inherits Window {
                     y: parent.height*(2/8) + parent.height*(1/5);
                     width: 50px;
                     height: 50px;
-                    text: "resource_one";
+                    text: "Address";
                     checked: root.is-value-hidden;
                     toggled => { 
                         if (self.checked) {hide_column(self.text)} else {show_column(self.text)};
@@ -185,7 +184,7 @@ export component AppWindow inherits Window {
                     y: parent.height*(3/8) + parent.height*(1/5);
                     width: 50px;
                     height: 50px;
-                    text: "Type";
+                    text: "Phone Number";
                     checked: root.is-type-hidden;
                     toggled => { 
                         if (self.checked) {hide_column(self.text)} else {show_column(self.text)};
@@ -199,7 +198,7 @@ export component AppWindow inherits Window {
                     y: parent.height*(1/8) + parent.height*(1/5);
                     width: 50px;
                     height: 50px;
-                    text: "Number";
+                    text: "Pathway";
                     checked: root.is-phone-number-hidden;
                     toggled => { 
                         if (self.checked) {hide_column(self.text)} else {show_column(self.text)};
@@ -213,7 +212,7 @@ export component AppWindow inherits Window {
                     y: parent.height*(2/8) + parent.height*(1/5);
                     width: 50px;
                     height: 50px;
-                    text: "Address";
+                    text: "Email";
                     checked: root.is-address-hidden;
                     toggled => { 
                         if (self.checked) {hide_column(self.text)} else {show_column(self.text)};
@@ -227,7 +226,7 @@ export component AppWindow inherits Window {
                     y: parent.height*(3/8) + parent.height*(1/5);
                     width: 50px;
                     height: 50px;
-                    text: "Scholarship";
+                    text: "Organization";
                     checked: root.is-scholarship-hidden;
                     toggled => { 
                         if (self.checked) {hide_column(self.text)} else {show_column(self.text)};
@@ -309,7 +308,7 @@ export component AppWindow inherits Window {
                         y: parent.y;
                         height: parent.height;
                         font-size: 14px;
-                        placeholder-text: "Value";
+                        placeholder-text: "Pathway";
                         text: inbox-value-var;
                         edited => { 
                             inbox-value-var = self.text;
@@ -320,7 +319,7 @@ export component AppWindow inherits Window {
                         y: parent.y;
                         height: parent.height;
                         font-size: 14px;
-                        placeholder-text: "Type";
+                        placeholder-text: "Address";
                         text: inbox-type-var;
                         edited => { 
                             inbox-type-var = self.text;
@@ -337,7 +336,7 @@ export component AppWindow inherits Window {
                         y: parent.y;
                         height: parent.height;
                         font-size: 14px;
-                        placeholder-text: "Phone Number";
+                        placeholder-text: "Email";
                         text: inbox-phone-var;
                         edited => { 
                             inbox-phone-var = self.text;
@@ -348,7 +347,7 @@ export component AppWindow inherits Window {
                         y: parent.y;
                         height: parent.height;
                         font-size: 14px;
-                        placeholder-text: "Address";
+                        placeholder-text: "Phone Number";
                         text: inbox-address-var;
                         edited => { 
                             inbox-address-var = self.text;
@@ -359,7 +358,7 @@ export component AppWindow inherits Window {
                         y: parent.y;
                         height: parent.height;
                         font-size: 14px;
-                        placeholder-text: "Scholarship";
+                        placeholder-text: "Organization";
                         text: inbox-scholarship-var;
                         edited => { 
                             inbox-scholarship-var = self.text;
@@ -376,12 +375,10 @@ export component AppWindow inherits Window {
 
             table_display := Rectangle { // add a scrollview to contain the tableview
                 background: lightgray;
-                /*
+                
                 ScrollView {
-                    x: parent.x;
-                    y: parent.y;
-                    width: parent.width;
-                    height: parent.height; */
+                    width: 100%;
+                    height: 100%;
                     
                     csv_display := StandardTableView {
                         x: parent.x;
@@ -401,7 +398,7 @@ export component AppWindow inherits Window {
                         }
                         
                     }
-                //}
+                }
             }
         }
     }

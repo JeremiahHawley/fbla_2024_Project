@@ -44,9 +44,9 @@ fn main() -> Result<(), slint::PlatformError> {
             let mut hidden_headers_bool_vec: Vec<bool> = vec![
                 // NOTE: if the hide buttons correspond to the wrong columns, switch the orders of the following get functions/elements to be in the same order as the column headers
                 !ui.get_is_name_hidden(),
-                !ui.get_is_address_hidden(),
                 !ui.get_is_phone_number_hidden(),
                 !ui.get_is_value_hidden(),
+                !ui.get_is_address_hidden(),
                 !ui.get_is_type_hidden(),
                 !ui.get_is_scholarship_hidden()
             ];
@@ -195,37 +195,14 @@ fn main() -> Result<(), slint::PlatformError> {
             *ref_database_copy = load_from_csv(CSV_FILEPATH);
             *temp_database = ref_database_copy.clone();
 
-            //ui.invoke_update_search();
             update_table_display_from_database(&ui, &temp_database, shown_headers_internal);
         }
     });
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     ui.run()
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -251,17 +228,6 @@ fn body_list_from_database(database: csv::Database, shown_headers: Rc<RefCell<Ve
     return csv::db_to_2d_vec(database, shown_headers.borrow().clone())[1..].to_vec();
 }
 
-
-
-
-
-fn get_help_text() -> SharedString {
-    // create string from txt file
-    let help_text = include_str!("help.txt");
-    let help_text = help_text.to_string();
-    let help_text = SharedString::from(help_text);
-    return help_text;
-}
 
 
 fn transform_header_list(header_list: Vec<String>) -> ModelRc<TableColumn> {
